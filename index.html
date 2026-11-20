@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KamalFPS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f5f7;--card:#fff;--bd:#dfe2e8;--tx:#101828;--mut:#667085;--ac:#2f5bff;--ok:#12b76a}
+@media(prefers-color-scheme:dark){:root{--bg:#0d1017;--card:#161a23;--bd:#262c38;--tx:#eceef3;--mut:#8b93a5;--ac:#6b8cff}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:20px 16px 60px}
+header{display:flex;justify-content:space-between;align-items:center;padding:8px 0 28px}
+h1,h2,.big{font-family:"Space Grotesk",system-ui,sans-serif;margin:0}
+h2{font-size:1.1rem;margin-bottom:12px}.mut{color:var(--mut)}.hide{display:none!important}
+a{color:var(--ac)}.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:18px;margin-bottom:16px}
+.hero{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.hero img{width:72px;height:72px;border-radius:50%;background:var(--bd)}
+.big{font-size:clamp(2.8rem,10vw,4.6rem);font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.stats{display:flex;gap:28px;margin-top:14px;flex-wrap:wrap}.stats b{display:block;font:700 1.2rem "Space Grotesk",sans-serif}
+.bar{height:8px;background:var(--bd);border-radius:4px;overflow:hidden;margin-top:14px}.bar i{display:block;height:100%;background:var(--ac);width:0;transition:width .6s}
+.row{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid var(--bd)}.row:first-of-type{border-top:0}
+button,input,select{font:inherit;color:inherit;background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:8px 12px}
+button{cursor:pointer}button.p{background:var(--ac);border-color:var(--ac);color:#fff}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.f{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.f>*{flex:1;min-width:130px}
+.dot{color:var(--ok)}
+</style></head><body><main>
+<header><h1>KamalFPS</h1><nav><a href="#studio" id="nav">Studio login</a> <a href="thumbnails.html" id="thl" class="hide" style="margin-left:14px">Thumbnails</a></nav></header>
+
+<section id="pub">
+ <div class="card">
+  <div class="hero"><img id="av" alt=""><div style="flex:1;min-width:200px">
+   <div class="mut"><span class="dot">●</span> Live subscribers</div>
+   <div class="big" id="subs">…</div></div>
+   <a href="https://youtube.com/@kamalfps?sub_confirmation=1"><button class="p">Subscribe</button></a></div>
+  <div class="stats"><div><span class="mut">Views</span><b id="views">…</b></div><div><span class="mut">Videos</span><b id="vids">…</b></div></div>
+  <div id="gl" class="hide"><div class="bar"><i id="gb"></i></div><div class="mut" id="gt" style="font-size:.85rem;margin-top:6px"></div></div>
+  <div id="yerr" class="mut" style="margin-top:10px"></div>
+ </div>
+ <div class="card"><h2>Stream schedule</h2><div id="sch" class="mut">No streams scheduled yet.</div></div>
+ <div class="card"><h2>Top recent videos</h2><div id="top" class="mut">Loading…</div></div>
+</section>
+
+<section id="studio" class="hide">
+ <div class="card" id="auth"><h2>Studio login</h2>
+  <div class="f"><input id="em" type="email" placeholder="Email" autocomplete="email"><input id="pw" type="password" placeholder="Password" autocomplete="current-password"></div>
+  <button class="p" id="si">Sign in</button> <button id="su">Create account</button>
+  <p class="mut" id="am"></p></div>
+ <div id="tools" class="hide">
+  <div class="card"><h2>Title generator</h2>
+   <div class="f"><input id="tg" placeholder="Game (e.g. Valorant)"><input id="tt" placeholder="Topic (e.g. 1v5 clutch)"><input id="tr" placeholder="Rank or goal (optional)"></div>
+   <button class="p" id="gen">Generate titles</button> <span class="mut" id="gm"></span>
+   <div id="tl" style="margin-top:12px"></div></div>
+  <div class="card"><h2>Saved titles</h2><div id="fv" class="mut">Star a title to save it here.</div></div>
+  <div class="card"><h2>Public schedule</h2><p class="mut" style="margin-top:0">Shown to viewers on the home page.</p>
+   <div id="se"></div><button id="sa">Add stream</button> <button class="p" id="ss">Publish schedule</button> <span class="mut" id="sm"></span></div>
+  <div class="card"><h2>Subscriber goal</h2><div class="f"><input id="gi" type="number" min="1" placeholder="Target subscribers"><button class="p" id="gs">Save goal</button></div></div>
+  <button id="so">Sign out</button>
+ </div>
+</section></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script>
+const C=Object.assign({YT_HANDLE:"kamalfps"},window.CFG||{}),$=i=>document.getElementById(i);
+const E=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const sb=window.supabase&&C.SUPABASE_URL&&C.SUPABASE_ANON_KEY?window.supabase.createClient(C.SUPABASE_URL,C.SUPABASE_ANON_KEY):null;
+let user=null,subs=0,goal=0,sched=[],favs=[],vt=0;
+/* live YouTube */
+function goalUI(){const g=$("gl");if(!goal){g.classList.add("hide");return}g.classList.remove("hide");$("gb").style.width=Math.min(100,subs/goal*100)+"%";$("gt").textContent=subs.toLocaleString()+" of "+goal.toLocaleString()+" subscribers"}
+async function yt(){if(!C.YT_API_KEY){$("yerr").textContent="Add your YouTube API key in config.js to turn on live stats.";return}
+ const B="https://www.googleapis.com/youtube/v3/",K="&key="+C.YT_API_KEY;
+ try{const j=await(await fetch(`${B}channels?part=snippet,statistics,contentDetails&forHandle=${encodeURIComponent(C.YT_HANDLE)}${K}`)).json(),c=j.items&&j.items[0];
+  if(!c)throw new Error(j.error?j.error.message:"Channel not found");
+  const s=c.statistics;subs=+s.subscriberCount;
+  $("subs").textContent=s.hiddenSubscriberCount?"Hidden":subs.toLocaleString();
+  $("views").textContent=(+s.viewCount).toLocaleString();$("vids").textContent=s.videoCount;$("av").src=c.snippet.thumbnails.medium.url;$("yerr").textContent="";goalUI();
+  if(Date.now()-vt>6e5){vt=Date.now();
+   const p=await(await fetch(`${B}playlistItems?part=contentDetails&maxResults=15&playlistId=${c.contentDetails.relatedPlaylists.uploads}${K}`)).json(),
+   ids=(p.items||[]).map(i=>i.contentDetails.videoId).join(","),v=ids?await(await fetch(`${B}videos?part=snippet,statistics&id=${ids}${K}`)).json():{items:[]};
+   $("top").innerHTML=(v.items||[]).sort((a,b)=>b.statistics.viewCount-a.statistics.viewCount).slice(0,5).map(i=>`<div class="row"><a href="https://youtu.be/${i.id}">${E(i.snippet.title)}</a><span class="mut">${(+i.statistics.viewCount).toLocaleString()} views</span></div>`).join("")||"No videos yet."}
+ }catch(e){$("yerr").textContent="Couldn't reach YouTube: "+e.message+". Check the API key restrictions."}}
+/* cloud data */
+async function site(k){if(!sb)return null;const r=await sb.from("site").select("value").eq("key",k).maybeSingle();return r.data?r.data.value:null}
+async function loadPublic(){sched=(await site("schedule"))||[];const g=await site("goal");goal=g?+g.target:0;
+ $("sch").innerHTML=sched.length?sched.map(s=>`<div class="row"><b>${E(s.day)} ${E(s.time)}</b><span>${E(s.title)}</span></div>`).join(""):"No streams scheduled yet.";goalUI()}
+async function kvGet(k){const r=await sb.from("kv").select("value").eq("key",k).maybeSingle();return r.data?r.data.value:null}
+const kvSet=(k,v)=>sb.from("kv").upsert({key:k,value:v});
+/* auth + studio */
+function showStudio(){const on=location.hash==="#studio";$("pub").classList.toggle("hide",on);$("studio").classList.toggle("hide",!on);$("nav").textContent=on?"Back to home":"Studio login";$("nav").href=on?"#":"#studio"}
+addEventListener("hashchange",showStudio);showStudio();
+function setU(u){user=u;$("auth").classList.toggle("hide",!!u);$("tools").classList.toggle("hide",!u);$("thl").classList.toggle("hide",!u);if(u)studioLoad()}
+$("si").onclick=async()=>{if(!sb)return $("am").textContent="Add your Supabase keys in config.js first.";const r=await sb.auth.signInWithPassword({email:$("em").value,password:$("pw").value});r.error?$("am").textContent=r.error.message:setU(r.data.user)};
+$("su").onclick=async()=>{if(!sb)return $("am").textContent="Add your Supabase keys in config.js first.";const r=await sb.auth.signUp({email:$("em").value,password:$("pw").value});$("am").textContent=r.error?r.error.message:"Account created. Confirm your email if asked, then sign in."};
+$("so").onclick=async()=>{await sb.auth.signOut();setU(null)};
+async function studioLoad(){favs=(await kvGet("favs"))||[];favUI();seUI();$("gi").value=goal||""}
+/* titles */
+const T=[(g,t,r)=>`${t} in ${g}`,(g,t,r)=>`I tried ${t} in ${g} so you don't have to`,(g,t,r)=>`${g}: ${t} (full breakdown)`,(g,t,r)=>r?`How I reached ${r} in ${g}`:`How I got better at ${g}`,
+(g,t,r)=>`This ${t} changed my ${g} games`,(g,t,r)=>`${t}, but it's ${g} on hard mode`,(g,t,r)=>r?`${r} or nothing | ${g} ${t}`:`${g} ${t} | live highlights`,
+(g,t,r)=>`Nobody expected this ${t} in ${g}`,(g,t,r)=>`Day 1: ${t} in ${g}`,(g,t,r)=>`${t} tips every ${g} player needs`];
+function favUI(){$("fv").innerHTML=favs.length?favs.map((t,i)=>`<div class="row"><span>${E(t)}</span><button data-d="${i}">Remove</button></div>`).join(""):"Star a title to save it here."}
+$("gen").onclick=()=>{const g=$("tg").value.trim(),t=$("tt").value.trim(),r=$("tr").value.trim();if(!g||!t)return $("gm").textContent="Enter a game and a topic.";$("gm").textContent="";
+ $("tl").innerHTML=[...T].sort(()=>Math.random()-.5).map(f=>f(g,t,r)).map(x=>`<div class="row"><span>${E(x)} <span class="mut">${x.length} chars</span></span><span><button data-c="${E(x)}">Copy</button> <button data-s="${E(x)}">Star</button></span></div>`).join("")};
+document.addEventListener("click",async e=>{const d=e.target.dataset;
+ if(d.c){await navigator.clipboard.writeText(d.c);e.target.textContent="Copied"}
+ if(d.s&&!favs.includes(d.s)){favs.push(d.s);favUI();kvSet("favs",favs)}
+ if(d.d){favs.splice(+d.d,1);favUI();kvSet("favs",favs)}
+ if(d.x){sched.splice(+d.x,1);seUI()}});
+/* schedule + goal */
+const DAYS=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+function seUI(){$("se").innerHTML=sched.map((s,i)=>`<div class="f"><select data-i="${i}" data-k="day">${DAYS.map(d=>`<option ${d===s.day?"selected":""}>${d}</option>`).join("")}</select><input type="time" data-i="${i}" data-k="time" value="${E(s.time)}"><input data-i="${i}" data-k="title" value="${E(s.title)}" placeholder="Stream title"><button data-x="${i}">Remove</button></div>`).join("")}
+$("se").addEventListener("input",e=>{const d=e.target.dataset;if(d.k)sched[+d.i][d.k]=e.target.value});
+$("sa").onclick=()=>{sched.push({day:"Mon",time:"20:00",title:""});seUI()};
+$("ss").onclick=async()=>{const r=await sb.from("site").upsert({key:"schedule",value:sched});$("sm").textContent=r.error?r.error.message:"Published";loadPublic()};
+$("gs").onclick=async()=>{goal=+$("gi").value||0;await sb.from("site").upsert({key:"goal",value:{target:goal}});goalUI()};
+/* start */
+yt();setInterval(yt,60000);
+if(sb){loadPublic();sb.auth.getSession().then(r=>setU(r.data.session&&r.data.session.user))}
+else $("sch").textContent="Add your Supabase keys in config.js to show the schedule.";
+</script></body></html>
