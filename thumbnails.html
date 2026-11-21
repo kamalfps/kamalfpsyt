@@ -1,0 +1,122 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Thumbnails · KamalFPS</title><link rel="stylesheet" href="theme.css"><style>.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}.l{display:block;font-size:.78rem;color:var(--mut);margin-bottom:4px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.lb{cursor:pointer;border:1px solid var(--bd);border-radius:10px;padding:9px 14px;background:#0e1120}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-bottom:16px}.g2 .card{margin:0}
+#cv{width:100%;height:auto;display:block;border:1px solid var(--bd);touch-action:none}
+.lrow{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:5px 8px;border:1px solid var(--bd);border-radius:10px;margin-bottom:6px;cursor:pointer}.lrow.on{border-color:var(--ac)}.lrow button{padding:2px 7px;font-size:.75rem}
+input[type=range],input[type=color]{padding:0;height:32px;width:100%}textarea{width:100%}</style></head><body>
+<div class="aurora"><i></i><i></i><i></i></div>
+<main class="wrap" id="t_thumb"><nav class="top" id="top"></nav><h1>Thumbnail maker</h1><p class="mut">Everything saves in this browser. Your latest design comes back when you return.</p><div class="card"><h2>Canvas</h2>
+<p class="mut" style="margin-top:0">Add as many texts, boxes, arrows and images as you want. Click to select, drag to move, the square corner resizes, the round handle rotates. Delete removes, arrow keys nudge, Ctrl+Z undoes.</p>
+<canvas id="cv" width="1280" height="720"></canvas>
+<div class="btns" style="justify-content:space-between"><span style="display:flex;gap:10px;align-items:center"><canvas id="pv" width="168" height="94" style="width:168px;border-radius:2px;border:1px solid var(--bd)"></canvas><span class="mut" style="font-size:.8rem">phone size<br><label><input type="checkbox" id="gd"> guides</label></span></span><span style="display:flex;gap:8px;flex-wrap:wrap"><button id="ud">Undo</button><button id="rd">Redo</button><button id="dayb">Countdown text</button><button id="exj">Download JPG</button><button class="p" id="exp2">Download PNG</button></span></div></div>
+<div class="g2"><div class="card"><h2>Add</h2><div class="btns" style="justify-content:flex-start;margin:0"><button id="at">Text</button><button id="ab">Box</button><button id="ac">Circle</button><button id="aa">Arrow</button><label class="lb">Image<input type="file" id="ai" accept="image/*" hidden></label></div>
+<h2 style="margin-top:14px">Templates</h2><div class="btns" id="tpl" style="justify-content:flex-start;margin:0"></div>
+<h2 style="margin-top:14px">Layers (top first)</h2><div id="ll"></div></div>
+<div class="card"><h2>Selected layer</h2><div class="g" id="pp"></div></div></div>
+<div class="card"><h2>Background</h2><div class="g"><div><span class="l">Colour</span><input type="range" id="bhue" min="0" max="360"></div><div><span class="l">Blur</span><input type="range" id="bbl" min="0" max="30"></div><div><span class="l">Brightness</span><input type="range" id="bbr" min="30" max="150"></div><div><span class="l">Dark edges</span><input type="range" id="bvg" min="0" max="90"></div><div><span class="l">Screenshot</span><input type="file" id="bimg" accept="image/*"></div></div></div>
+<div class="card"><h2>Presets</h2><div class="g"><div><span class="l">Preset name</span><input id="pn" placeholder="e.g. Rank-up yellow"></div><div style="align-self:end"><button id="ps">Save preset</button></div><div><span class="l">Saved presets</span><select id="pl"></select></div><div style="align-self:end"><button id="pload">Load</button> <button id="pdel">Delete</button></div></div></div></main>
+<script src="config.js"></script><script src="app.js"></script>
+<script>
+const up=s=>String(s).toUpperCase(),GM=JSON.parse(localStorage.getItem("kfgen")||"{}"),C=()=>({cur:"GRINDING",goal:GM.r||"NEXT RANK",a:GM.g||"FPS"}),ti=Math.max(0,Math.round((new Date()-new Date(2026,10,21))/864e5)),plan=()=>({th:DAYS_LEFT()+" DAYS\nTO 2027"});
+
+const FONTS=["Impact","Arial Black","Bahnschrift","Segoe UI Black","Trebuchet MS","Verdana","Georgia","Comic Sans MS","Courier New"],NM={rect:"Box",ell:"Circle",arrow:"Arrow",img:"Image"};
+let L=[],BG={hue:260,bl:0,br:100,vg:55,img:null},IMD={},IC={},selId=null,hist=[],hi=-1,drag=null,tm=null,PR={};
+const uid=()=>Math.random().toString(36).slice(2,8),sl=()=>L.find(l=>l.id===selId),esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const mk=o=>Object.assign({id:uid(),type:"text",x:640,y:360,w:200,h:100,rot:0,op:100,hide:false,t:"TEXT",font:"Impact",size:150,color:"#ffe600",stroke:"#000000",sw:10,glow:"#000000",gb:0,up:true,ol:0,oc:"#ffffff"},o);
+const shr=(i,mw,mh,t)=>{const k=Math.min(1,mw/i.width,mh/i.height),c=document.createElement("canvas");c.width=Math.round(i.width*k);c.height=Math.round(i.height*k);c.getContext("2d").drawImage(i,0,0,c.width,c.height);return c.toDataURL(t==="png"?"image/png":"image/jpeg",.85)};
+function readImg(f,mw,mh,t,cb){const r=new FileReader();r.onload=()=>{const i=new Image();i.onload=()=>cb(shr(i,mw,mh,t),i);i.src=r.result};r.readAsDataURL(f)}
+function getImg(k){if(!k||!IMD[k])return null;if(!IC[k]){const i=new Image();i.onload=()=>draw();i.src=IMD[k];IC[k]=i}return IC[k].complete&&IC[k].naturalWidth?IC[k]:null}
+function commit(){hist=hist.slice(0,hi+1);hist.push(JSON.stringify({L,BG}));hi++;if(hist.length>60){hist.shift();hi--}}
+function rs(){const o=JSON.parse(hist[hi]);L=o.L;BG=o.BG;if(!sl())selId=null;syncBG();list();panel();draw()}
+const undo=()=>{if(hi>0){hi--;rs()}},redo=()=>{if(hi<hist.length-1){hi++;rs()}};
+function drawLayer(x,l){x.save();x.globalAlpha=l.op/100;x.translate(l.x,l.y);x.rotate(l.rot*Math.PI/180);
+ if(l.type==="text"){x.font=`${900} ${l.size}px ${l.font}`;x.textAlign="center";x.textBaseline="middle";x.lineJoin="round";
+  const Ls=(l.up?l.t.toUpperCase():l.t).split("\n"),lh=l.size*1.08;let mw=0;Ls.forEach(s=>mw=Math.max(mw,x.measureText(s).width));l.w=mw+l.sw*2;l.h=Ls.length*lh;
+  Ls.forEach((s,i)=>{const y=(i-(Ls.length-1)/2)*lh;x.shadowColor=l.glow;x.shadowBlur=l.gb;
+   if(l.sw>0){x.lineWidth=l.sw*2;x.strokeStyle=l.stroke;x.strokeText(s,0,y);x.shadowBlur=0}
+   x.fillStyle=l.color;x.fillText(s,0,y);x.shadowBlur=0})}
+ else if(l.type==="img"){const im=getImg(l.src);if(im){if(l.ol>0)for(let k=0;k<16;k++){const a=k*Math.PI/8;x.shadowColor=l.oc;x.shadowBlur=0;x.shadowOffsetX=Math.cos(a)*l.ol;x.shadowOffsetY=Math.sin(a)*l.ol;x.drawImage(im,-l.w/2,-l.h/2,l.w,l.h)}x.shadowColor="transparent";x.shadowOffsetX=0;x.shadowOffsetY=0;x.drawImage(im,-l.w/2,-l.h/2,l.w,l.h)}}
+ else{x.fillStyle=l.color;x.strokeStyle=l.stroke;x.lineWidth=l.sw*2;x.lineJoin="round";x.beginPath();
+  if(l.type==="rect")x.rect(-l.w/2,-l.h/2,l.w,l.h);
+  else if(l.type==="ell")x.ellipse(0,0,l.w/2,l.h/2,0,0,7);
+  else{const w=l.w,h=l.h;x.moveTo(-w/2,-h*.2);x.lineTo(w*.1,-h*.2);x.lineTo(w*.1,-h*.5);x.lineTo(w/2,0);x.lineTo(w*.1,h*.5);x.lineTo(w*.1,h*.2);x.lineTo(-w/2,h*.2);x.closePath()}
+  x.fill();if(l.sw>0)x.stroke()}
+ x.restore()}
+function ov(x){if($("gd").checked){x.save();x.strokeStyle="rgba(255,255,255,.4)";x.lineWidth=2;x.setLineDash([8,8]);[427,853].forEach(a=>{x.beginPath();x.moveTo(a,0);x.lineTo(a,720);x.stroke()});[240,480].forEach(a=>{x.beginPath();x.moveTo(0,a);x.lineTo(1280,a);x.stroke()});x.fillStyle="rgba(255,0,0,.3)";x.fillRect(1070,650,210,70);x.restore()}
+ const l=sl();if(!l||l.hide)return;x.save();x.translate(l.x,l.y);x.rotate(l.rot*Math.PI/180);x.strokeStyle="#00c8ff";x.fillStyle="#00c8ff";x.lineWidth=3;x.setLineDash([10,6]);x.strokeRect(-l.w/2,-l.h/2,l.w,l.h);x.setLineDash([]);x.fillRect(l.w/2-10,l.h/2-10,20,20);x.beginPath();x.moveTo(0,-l.h/2);x.lineTo(0,-l.h/2-33);x.stroke();x.beginPath();x.arc(0,-l.h/2-45,12,0,7);x.fill();x.restore()}
+function draw(show=true){const c=$("cv"),x=c.getContext("2d");x.clearRect(0,0,1280,720);
+ x.save();const bi=getImg(BG.img);
+ if(bi){x.filter=`brightness(${BG.br}%) blur(${BG.bl}px)`;const m=BG.bl*3,s=Math.max((1280+2*m)/bi.width,(720+2*m)/bi.height);x.drawImage(bi,640-bi.width*s/2,360-bi.height*s/2,bi.width*s,bi.height*s)}
+ else{const g=x.createLinearGradient(0,0,1280,720);g.addColorStop(0,`hsl(${BG.hue} 85% 45%)`);g.addColorStop(1,`hsl(${(BG.hue+70)%360} 75% 14%)`);x.fillStyle=g;x.fillRect(0,0,1280,720)}
+ x.restore();
+ if(BG.vg>0){const g=x.createRadialGradient(640,360,220,640,360,820);g.addColorStop(0,"rgba(0,0,0,0)");g.addColorStop(1,`rgba(0,0,0,${BG.vg/100})`);x.fillStyle=g;x.fillRect(0,0,1280,720)}
+ L.forEach(l=>{if(!l.hide)drawLayer(x,l)});
+ try{$("pv").getContext("2d").drawImage(c,0,0,168,94)}catch(e){}
+ if(show)ov(x);clearTimeout(tm);tm=setTimeout(()=>{try{localStorage.setItem("road27thumb2",JSON.stringify(getSt()))}catch(e){}},600)}
+function hitL(p){for(let i=L.length-1;i>=0;i--){const l=L[i];if(l.hide)continue;const a=-l.rot*Math.PI/180,dx=p.x-l.x,dy=p.y-l.y,lx=dx*Math.cos(a)-dy*Math.sin(a),ly=dx*Math.sin(a)+dy*Math.cos(a);if(Math.abs(lx)<=l.w/2&&Math.abs(ly)<=l.h/2)return l}return null}
+const cv=$("cv"),pt=e=>{const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)*1280/r.width,y:(e.clientY-r.top)*720/r.height}},dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+const wp=(l,lx,ly)=>{const a=l.rot*Math.PI/180;return{x:l.x+lx*Math.cos(a)-ly*Math.sin(a),y:l.y+lx*Math.sin(a)+ly*Math.cos(a)}};
+cv.addEventListener("pointerdown",e=>{const p=pt(e),l=sl();
+ if(l){if(dist(p,wp(l,l.w/2,l.h/2))<26){drag={m:"s",d0:dist(p,l),s0:l.size,w0:l.w,h0:l.h};cv.setPointerCapture(e.pointerId);return}
+  if(dist(p,wp(l,0,-l.h/2-45))<26){drag={m:"r"};cv.setPointerCapture(e.pointerId);return}}
+ const h=hitL(p);if(h){selId=h.id;drag={m:"m",dx:p.x-h.x,dy:p.y-h.y};cv.setPointerCapture(e.pointerId)}else selId=null;list();panel();draw()});
+cv.addEventListener("pointermove",e=>{const p=pt(e),l=sl();
+ if(!drag){cv.style.cursor=hitL(p)?"move":"default";return}
+ if(!l)return;
+ if(drag.m==="m"){let nx=p.x-drag.dx,ny=p.y-drag.dy;if(Math.abs(nx-640)<8)nx=640;if(Math.abs(ny-360)<8)ny=360;l.x=nx;l.y=ny}
+ else if(drag.m==="s"){const k=dist(p,l)/drag.d0;if(l.type==="text")l.size=Math.max(20,Math.min(400,drag.s0*k));else{l.w=Math.max(20,drag.w0*k);l.h=Math.max(20,drag.h0*k)}}
+ else{let r=Math.round(Math.atan2(p.y-l.y,p.x-l.x)*180/Math.PI+90);if(r>180)r-=360;l.rot=r}
+ draw()});
+cv.addEventListener("pointerup",()=>{if(drag){drag=null;commit();panel()}});
+document.addEventListener("keydown",e=>{if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)||$("t_thumb").classList.contains("hide"))return;const l=sl(),m=e.ctrlKey||e.metaKey;
+ if(m&&e.key==="z"){e.preventDefault();undo();return}if(m&&e.key==="y"){e.preventDefault();redo();return}
+ if(!l)return;const d=e.shiftKey?10:2;
+ if(e.key==="Delete"||e.key==="Backspace"){L=L.filter(x=>x!==l);selId=null;commit();list();panel();draw()}
+ else if(e.key.startsWith("Arrow")){e.preventDefault();if(e.key==="ArrowLeft")l.x-=d;if(e.key==="ArrowRight")l.x+=d;if(e.key==="ArrowUp")l.y-=d;if(e.key==="ArrowDown")l.y+=d;draw()}});
+function list(){$("ll").innerHTML=[...L].reverse().map(l=>`<div class="lrow ${l.id===selId?"on":""}" data-id="${l.id}"><span>${l.type==="text"?esc((l.t.split("\n")[0]||"Text").slice(0,16)):NM[l.type]}${l.hide?" (hidden)":""}</span><span><button data-a="u">↑</button><button data-a="d">↓</button><button data-a="h">Hide</button><button data-a="c">Copy</button><button data-a="x">Del</button></span></div>`).join("")||'<p class="mut">No layers yet.</p>'}
+$("ll").addEventListener("click",e=>{const r=e.target.closest("[data-id]");if(!r)return;const i=L.findIndex(l=>l.id===r.dataset.id),a=e.target.dataset.a,l=L[i];
+ if(a==="u"&&i<L.length-1){const t=L[i];L[i]=L[i+1];L[i+1]=t}
+ else if(a==="d"&&i>0){const t=L[i];L[i]=L[i-1];L[i-1]=t}
+ else if(a==="h")l.hide=!l.hide;
+ else if(a==="c"){const n=Object.assign({},l,{id:uid(),x:l.x+30,y:l.y+30});L.splice(i+1,0,n);selId=n.id}
+ else if(a==="x"){L.splice(i,1);selId=null}
+ else selId=l.id;
+ if(a)commit();list();panel();draw()});
+const R=(p,l,a,b,t)=>`<div><span class="l">${t}</span><input type="range" data-p="${p}" min="${a}" max="${b}" value="${l[p]}"></div>`,Cc=(p,l,t)=>`<div><span class="l">${t}</span><input type="color" data-p="${p}" value="${l[p]}"></div>`;
+function panel(){const l=sl();if(!l){$("pp").innerHTML='<p class="mut" style="grid-column:1/-1">Click a layer on the picture or in the list.</p>';return}
+ let h="";
+ if(l.type==="text")h+=`<div style="grid-column:1/-1"><span class="l">Text (Enter = new line)</span><textarea data-p="t" rows="2">${esc(l.t)}</textarea></div><div><span class="l">Font</span><select data-p="font">${FONTS.map(f=>`<option ${f===l.font?"selected":""}>${f}</option>`).join("")}</select></div>`+R("size",l,20,320,"Size")+Cc("color",l,"Colour")+Cc("stroke",l,"Outline colour")+R("sw",l,0,24,"Outline width")+Cc("glow",l,"Shadow / glow")+R("gb",l,0,50,"Shadow blur")+`<div><span class="l">All caps</span><input type="checkbox" data-p="up" ${l.up?"checked":""}></div>`;
+ else if(l.type==="img")h+=R("ol",l,0,30,"Sticker outline")+Cc("oc",l,"Outline colour");
+ else h+=Cc("color",l,"Fill")+Cc("stroke",l,"Outline colour")+R("sw",l,0,24,"Outline width")+R("w",l,20,1280,"Width")+R("h",l,20,720,"Height");
+ $("pp").innerHTML=h+R("rot",l,-180,180,"Rotate")+R("op",l,10,100,"Opacity")}
+$("pp").addEventListener("input",e=>{const t=e.target,p=t.dataset.p,l=sl();if(!p||!l)return;l[p]=t.type==="checkbox"?t.checked:t.type==="range"?+t.value:t.value;if(p==="t")list();draw()});
+$("pp").addEventListener("change",()=>{commit();list()});
+function add(o){const l=mk(o);L.push(l);selId=l.id;commit();list();panel();draw()}
+$("at").onclick=()=>add({t:"NEW TEXT"});$("ab").onclick=()=>add({type:"rect",w:320,h:140,color:"#ff2d55",sw:0});$("ac").onclick=()=>add({type:"ell",w:240,h:240,color:"#ffe600",sw:8});$("aa").onclick=()=>add({type:"arrow",w:260,h:160,color:"#ffffff",sw:8,rot:-10});
+$("ai").onchange=e=>{const f=e.target.files[0];if(!f)return;readImg(f,900,900,"png",(u,i)=>{const k="i"+uid(),s=Math.min(1,520/i.width,520/i.height);IMD[k]=u;add({type:"img",src:k,w:Math.round(i.width*s),h:Math.round(i.height*s)})});e.target.value=""};
+$("bimg").onchange=e=>{const f=e.target.files[0];if(f)readImg(f,1280,720,"jpg",u=>{IMD.bg=u;delete IC.bg;BG.img="bg";commit();draw()})};
+const BGM=[["bhue","hue"],["bbl","bl"],["bbr","br"],["bvg","vg"]];
+function syncBG(){BGM.forEach(([i,k])=>$(i).value=BG[k])}
+BGM.forEach(([i,k])=>{$(i).addEventListener("input",()=>{BG[k]=+$(i).value;draw()});$(i).addEventListener("change",commit)});
+$("ud").onclick=undo;$("rd").onclick=redo;
+function useDay(i){const p=plan(i),l=L.find(x=>x.type==="text");if(l){l.t=p.th;commit();list();panel();draw()}else add({t:p.th})}
+$("dayb").onclick=()=>useDay(ti);
+function out(t){draw(false);const u=cv.toDataURL(t==="png"?"image/png":"image/jpeg",.92);draw();const a=document.createElement("a");a.download=`thumbnail-day-${ti+1}.${t}`;a.href=u;a.click()}
+$("exp2").onclick=()=>out("png");$("exj").onclick=()=>out("jpg");
+const TP={"Rank-up":()=>[mk({t:"TODAY\n"+up(C().goal)+"?",x:380,y:300,size:210}),mk({type:"rect",x:330,y:610,w:560,h:80,color:"#ff2d55",sw:0}),mk({t:up(C().cur)+" → "+up(C().goal),x:330,y:610,size:52,color:"#ffffff",sw:0}),mk({type:"arrow",x:760,y:330,w:200,h:130,color:"#ffffff",sw:8,rot:-12})],
+ "Clutch":()=>[mk({t:"1v4\nCLUTCH!!",x:400,y:330,size:200,color:"#00f5ff"}),mk({t:up(C().a)+" ACE?",x:300,y:90,size:70,color:"#ffffff",sw:6})],
+ "Challenge":()=>[mk({t:up(C().a)+" ONLY\n"+up(C().goal)+" OR QUIT",x:420,y:330,size:150,color:"#7CFF4D"}),mk({t:"DAY "+(ti+1),x:1100,y:90,size:90,color:"#ffffff",rot:8})],
+ "Patch":()=>[mk({t:"NEW PATCH",x:450,y:270,size:200,color:"#ffffff"}),mk({t:"FIRST RANKED GAMES",x:450,y:470,size:80,color:"#ffe600"})]};
+$("tpl").innerHTML=Object.keys(TP).map(k=>`<button data-tp="${k}">${k}</button>`).join("");
+$("tpl").addEventListener("click",e=>{const k=e.target.dataset.tp;if(k){L=TP[k]();selId=null;commit();list();panel();draw()}});
+function getSt(){const u=new Set(L.filter(l=>l.type==="img").map(l=>l.src));if(BG.img)u.add(BG.img);const d={};u.forEach(k=>{if(IMD[k])d[k]=IMD[k]});return{L,BG,IMD:d}}
+function setSt(o){L=o.L||[];BG=Object.assign({hue:260,bl:0,br:100,vg:55,img:null},o.BG);IMD=o.IMD||{};IC={};selId=null;hist=[];hi=-1;commit();syncBG();list();panel();draw()}
+try{PR=JSON.parse(localStorage.getItem("road27presets")||"{}")}catch(e){}
+function prl(){$("pl").innerHTML=Object.keys(PR).map(n=>`<option>${esc(n)}</option>`).join("")||"<option value=''>No presets yet</option>"}
+function prs(){try{localStorage.setItem("road27presets",JSON.stringify(PR));return true}catch(e){alert("Browser storage is full. Delete a preset or use smaller images.");return false}}
+$("ps").onclick=()=>{const n=$("pn").value.trim().replace(/[<>&"']/g,"");if(!n)return alert("Type a preset name first.");PR[n]=JSON.parse(JSON.stringify(getSt()));if(prs()){prl();$("pl").value=n}};
+$("pload").onclick=()=>{const n=$("pl").value;if(PR[n])setSt(JSON.parse(JSON.stringify(PR[n])))};
+$("pdel").onclick=()=>{const n=$("pl").value;if(PR[n]&&confirm("Delete preset "+n+"?")){delete PR[n];prs();prl()}};
+try{const t=localStorage.getItem("road27thumb2");if(t)setSt(JSON.parse(t));else{L=TP["Rank-up"]();commit()}}catch(e){L=TP["Rank-up"]();commit()}
+syncBG();list();panel();prl();
+</script></body></html>
