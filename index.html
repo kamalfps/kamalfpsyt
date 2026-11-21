@@ -25,7 +25,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{ou
 .f{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.f>*{flex:1;min-width:130px}
 .dot{color:var(--ok)}
 </style></head><body><main>
-<header><h1>KamalFPS</h1><nav><a href="#studio" id="nav">Studio login</a> <a href="thumbnails.html" id="thl" class="hide" style="margin-left:14px">Thumbnails</a></nav></header>
+<header><h1>KamalFPS</h1><nav><a href="#studio" id="nav">Studio login</a> <a href="studio.html" style="margin-left:14px">Planner &amp; thumbnails</a></nav></header>
 
 <section id="pub">
  <div class="card">
@@ -78,7 +78,7 @@ async function yt(){if(!C.YT_API_KEY){$("yerr").textContent="Add your YouTube AP
    const p=await(await fetch(`${B}playlistItems?part=contentDetails&maxResults=15&playlistId=${c.contentDetails.relatedPlaylists.uploads}${K}`)).json(),
    ids=(p.items||[]).map(i=>i.contentDetails.videoId).join(","),v=ids?await(await fetch(`${B}videos?part=snippet,statistics&id=${ids}${K}`)).json():{items:[]};
    $("top").innerHTML=(v.items||[]).sort((a,b)=>b.statistics.viewCount-a.statistics.viewCount).slice(0,5).map(i=>`<div class="row"><a href="https://youtu.be/${i.id}">${E(i.snippet.title)}</a><span class="mut">${(+i.statistics.viewCount).toLocaleString()} views</span></div>`).join("")||"No videos yet."}
- }catch(e){$("yerr").textContent="Couldn't reach YouTube: "+e.message+". Check the API key restrictions."}}
+ }catch(e){$("yerr").textContent="Couldn't reach YouTube: "+e.message+". Create a fresh key in Google Cloud Console (see SETUP.md) and paste it in config.js."}}
 /* cloud data */
 async function site(k){if(!sb)return null;const r=await sb.from("site").select("value").eq("key",k).maybeSingle();return r.data?r.data.value:null}
 async function loadPublic(){sched=(await site("schedule"))||[];const g=await site("goal");goal=g?+g.target:0;

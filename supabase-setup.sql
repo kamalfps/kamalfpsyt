@@ -22,3 +22,6 @@ create policy "public read" on site for select using (true);
 create policy "owner insert" on site for insert with check (auth.uid() = owner);
 create policy "owner update" on site for update using (auth.uid() = owner) with check (auth.uid() = owner);
 create policy "owner delete" on site for delete using (auth.uid() = owner);
+
+-- needed by the planner page
+alter table kv add column if not exists updated_at timestamptz default now();
