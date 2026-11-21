@@ -20,7 +20,7 @@ $("gs").onclick=async()=>{const n=Math.floor(+$("gi").value);if(!(n>0))return $(
  $("gm").textContent=r.error?"Not saved: "+r.error.message:"Saved. Home page goal is now "+n.toLocaleString()+(subs>=n?". You already have "+subs.toLocaleString()+" subscribers, so set a higher goal.":".")};
 async function load(){sched=(await site("schedule"))||[];const g=await site("goal");$("gi").value=g?g.target:"";seUI();
  try{const c=await ytChannel();subs=c.subs;if(g&&subs>=g.target)$("gm").textContent="Goal reached ("+subs.toLocaleString()+" subscribers). Set a new goal."}catch(e){}}
-function setU(u){$("auth").classList.toggle("hide",!!u);$("tools").classList.toggle("hide",!u);if(u)load()}
+function setU(u){renderNav(!!u);$("auth").classList.toggle("hide",!!u);$("tools").classList.toggle("hide",!u);if(u)load()}
 const need=()=>{$("am").textContent="Add your Supabase keys in config.js first.";return true};
 $("si").onclick=async()=>{if(!sb&&need())return;const r=await sb.auth.signInWithPassword({email:$("em").value,password:$("pw").value});r.error?$("am").textContent=r.error.message:setU(r.data.user)};
 $("su").onclick=async()=>{if(!sb&&need())return;const r=await sb.auth.signUp({email:$("em").value,password:$("pw").value});$("am").textContent=r.error?r.error.message:"Account created. Confirm your email if asked, then log in."};

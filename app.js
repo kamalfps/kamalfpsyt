@@ -4,8 +4,11 @@ const E=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;
 const sb=window.supabase&&CFG.SUPABASE_URL&&CFG.SUPABASE_ANON_KEY?window.supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_ANON_KEY):null;
 const still=matchMedia("(prefers-reduced-motion:reduce)").matches;
 const DAYS_LEFT=()=>{const n=new Date();return Math.max(0,Math.round((new Date(2027,0,1)-new Date(n.getFullYear(),n.getMonth(),n.getDate()))/864e5))};
-(()=>{const el=$("top");if(!el)return;const cur=location.pathname.split("/").pop()||"index.html";
- el.innerHTML='<a class="logo" href="index.html">KamalFPS</a><span>'+[["index.html","Home"],["titles.html","Titles"],["thumbnails.html","Thumbnails"],["studio.html","Studio"]].map(([h,t])=>`<a href="${h}"${h===cur?' class="on"':""}>${t}</a>`).join("")+"</span>"})();
+function renderNav(full){const el=$("top");if(!el)return;const cur=location.pathname.split("/").pop()||"index.html",items=[["index.html","Home"],["titles.html","Titles"],["thumbnails.html","Thumbnails"],["studio.html","Studio"]];
+ el.innerHTML='<a class="logo" href="index.html">KamalFPS</a>'+(full?"<span>"+items.map(([h,t])=>`<a href="${h}"${h===cur?' class="on"':""}>${t}</a>`).join("")+"</span>":"")}
+let _au=null;const authReady=()=>_au||(_au=sb?sb.auth.getSession().then(r=>r.data.session?r.data.session.user:null):Promise.resolve(null));
+renderNav(false);
+authReady().then(u=>{renderNav(!!u);if(document.body.classList.contains("priv")){if(u)document.body.classList.add("ok");else location.replace("studio.html")}});
 function countTo(el,to){if(still){el.textContent=to.toLocaleString();return}const t0=performance.now(),f=t=>{const p=Math.min(1,(t-t0)/1500);el.textContent=Math.round(to*(1-Math.pow(1-p,3))).toLocaleString();if(p<1)requestAnimationFrame(f)};requestAnimationFrame(f)}
 async function site(k){if(!sb)return null;const r=await sb.from("site").select("value").eq("key",k).maybeSingle();return r.data?r.data.value:null}
 let _v=0,_top=[];

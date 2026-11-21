@@ -34,3 +34,4 @@ button{cursor:pointer;transition:transform .15s,border-color .2s}button:hover{bo
 .f{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}.f>*{flex:1;min-width:140px}.f>button{flex:0 0 auto}
 .js .rv{opacity:0;transform:translateY(16px);transition:opacity .7s,transform .7s}.js .rv.in{opacity:1;transform:none}.st{animation:up .5s both}
 @media(prefers-reduced-motion:reduce){*,*::before{animation:none!important;transition:none!important}.js .rv{opacity:1;transform:none}}
+.priv:not(.ok) .wrap>*:not(.top){display:none}
