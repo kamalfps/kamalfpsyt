@@ -24,19 +24,19 @@ button{cursor:pointer}button.p{background:var(--ac);border-color:var(--ac);color
 button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
 .f{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.f>*{flex:1;min-width:130px}
 .dot{color:var(--ok)}
-</style></head><body><main>
+</style><link rel="stylesheet" href="theme.css"></head><body><main>
 <header><h1>KamalFPS</h1><nav><a href="#studio" id="nav">Studio login</a> <a href="studio.html" style="margin-left:14px">Planner &amp; thumbnails</a></nav></header>
 
 <section id="pub">
- <div class="card">
-  <div class="hero"><img id="av" alt=""><div style="flex:1;min-width:200px">
-   <div class="mut"><span class="dot">●</span> Live subscribers</div>
-   <div class="big" id="subs">…</div></div>
-   <a href="https://youtube.com/@kamalfps?sub_confirmation=1"><button class="p">Subscribe</button></a></div>
-  <div class="stats"><div><span class="mut">Views</span><b id="views">…</b></div><div><span class="mut">Videos</span><b id="vids">…</b></div></div>
-  <div id="gl" class="hide"><div class="bar"><i id="gb"></i></div><div class="mut" id="gt" style="font-size:.85rem;margin-top:6px"></div></div>
-  <div id="yerr" class="mut" style="margin-top:10px"></div>
+ <div class="hero3d">
+  <div class="intro"><img id="av" alt=""><div class="live"><i></i> Live from YouTube</div><div class="name" id="cname">KamalFPS</div>
+   <p class="mut" style="margin:0 0 14px">Live streams, clutch plays and the road to the next rank.</p>
+   <a class="btn" href="https://youtube.com/@kamalfps?sub_confirmation=1">Subscribe</a><div id="yerr" class="mut" style="margin-top:12px;font-size:.85rem"></div></div>
+  <div class="stage" id="stage"><div class="tilt" id="tilt"><div class="cube" id="cube" tabindex="0" role="button" aria-label="Show next stat">
+   <div class="face f1"><b id="subs">…</b><span>subscribers</span></div><div class="face f2"><b id="views">…</b><span>total views</span></div>
+   <div class="face f3"><b id="vids">…</b><span>videos</span></div><div class="face f4"><b id="gnext">…</b><span>next goal</span></div></div></div></div>
  </div>
+ <div class="card" id="gl"><div class="grow"><b id="gh">Next goal</b><span class="mut" id="gt"></span></div><div class="bar"><i id="gb"></i></div><div class="chips" id="ms"></div></div>
  <div class="card"><h2>Stream schedule</h2><div id="sch" class="mut">No streams scheduled yet.</div></div>
  <div class="card"><h2>Top recent videos</h2><div id="top" class="mut">Loading…</div></div>
 </section>
@@ -54,7 +54,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{ou
   <div class="card"><h2>Saved titles</h2><div id="fv" class="mut">Star a title to save it here.</div></div>
   <div class="card"><h2>Public schedule</h2><p class="mut" style="margin-top:0">Shown to viewers on the home page.</p>
    <div id="se"></div><button id="sa">Add stream</button> <button class="p" id="ss">Publish schedule</button> <span class="mut" id="sm"></span></div>
-  <div class="card"><h2>Subscriber goal</h2><div class="f"><input id="gi" type="number" min="1" placeholder="Target subscribers"><button class="p" id="gs">Save goal</button></div></div>
+  <div class="card"><h2>Subscriber goal</h2><p class="mut" style="margin-top:0">When you reach a goal, the home page moves up to the next milestone by itself. Set a custom target any time.</p><div class="f"><input id="gi" type="number" min="1" placeholder="Target subscribers"><button class="p" id="gs">Save goal</button></div></div>
   <button id="so">Sign out</button>
  </div>
 </section></main>
@@ -66,14 +66,18 @@ const E=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;
 const sb=window.supabase&&C.SUPABASE_URL&&C.SUPABASE_ANON_KEY?window.supabase.createClient(C.SUPABASE_URL,C.SUPABASE_ANON_KEY):null;
 let user=null,subs=0,goal=0,sched=[],favs=[],vt=0;
 /* live YouTube */
-function goalUI(){const g=$("gl");if(!goal){g.classList.add("hide");return}g.classList.remove("hide");$("gb").style.width=Math.min(100,subs/goal*100)+"%";$("gt").textContent=subs.toLocaleString()+" of "+goal.toLocaleString()+" subscribers"}
+const MS=[100,250,500,1000,2500,5000,10000,25000,50000,100000,250000,500000,1000000];
+function goalUI(){const nx=goal>subs?goal:(MS.find(x=>x>subs)||subs*2),pv=Math.max(0,...MS.filter(x=>x<=subs)),done=goal>0&&goal<=subs?goal:0,k=x=>x>=1000?x/1000+"K":x;
+ $("gnext").textContent=nx.toLocaleString();$("gb").style.width=Math.min(100,Math.max(2,(subs-pv)/(nx-pv)*100))+"%";
+ $("gh").textContent=(done?done.toLocaleString()+" reached. ":"")+"Next goal: "+nx.toLocaleString();$("gt").textContent=subs?(nx-subs).toLocaleString()+" to go":"";
+ $("ms").innerHTML=MS.filter(x=>x<=nx).map(x=>`<span class="${x<=subs?"on":""}">${k(x)}</span>`).join("")}
 async function yt(){if(!C.YT_API_KEY){$("yerr").textContent="Add your YouTube API key in config.js to turn on live stats.";return}
  const B="https://www.googleapis.com/youtube/v3/",K="&key="+C.YT_API_KEY;
  try{const j=await(await fetch(`${B}channels?part=snippet,statistics,contentDetails&forHandle=${encodeURIComponent(C.YT_HANDLE)}${K}`)).json(),c=j.items&&j.items[0];
   if(!c)throw new Error(j.error?j.error.message:"Channel not found");
   const s=c.statistics;subs=+s.subscriberCount;
   $("subs").textContent=s.hiddenSubscriberCount?"Hidden":subs.toLocaleString();
-  $("views").textContent=(+s.viewCount).toLocaleString();$("vids").textContent=s.videoCount;$("av").src=c.snippet.thumbnails.medium.url;$("yerr").textContent="";goalUI();
+  $("views").textContent=(+s.viewCount).toLocaleString();$("vids").textContent=s.videoCount;$("cname").textContent=c.snippet.title;try{localStorage.setItem("kf",JSON.stringify({s:subs,v:+s.viewCount,n:+s.videoCount}))}catch(e){}$("av").src=c.snippet.thumbnails.medium.url;$("yerr").textContent="";goalUI();
   if(Date.now()-vt>6e5){vt=Date.now();
    const p=await(await fetch(`${B}playlistItems?part=contentDetails&maxResults=15&playlistId=${c.contentDetails.relatedPlaylists.uploads}${K}`)).json(),
    ids=(p.items||[]).map(i=>i.contentDetails.videoId).join(","),v=ids?await(await fetch(`${B}videos?part=snippet,statistics&id=${ids}${K}`)).json():{items:[]};
@@ -88,7 +92,7 @@ const kvSet=(k,v)=>sb.from("kv").upsert({key:k,value:v});
 /* auth + studio */
 function showStudio(){const on=location.hash==="#studio";$("pub").classList.toggle("hide",on);$("studio").classList.toggle("hide",!on);$("nav").textContent=on?"Back to home":"Studio login";$("nav").href=on?"#":"#studio"}
 addEventListener("hashchange",showStudio);showStudio();
-function setU(u){user=u;$("auth").classList.toggle("hide",!!u);$("tools").classList.toggle("hide",!u);$("thl").classList.toggle("hide",!u);if(u)studioLoad()}
+function setU(u){user=u;$("auth").classList.toggle("hide",!!u);$("tools").classList.toggle("hide",!u);if(u)studioLoad()}
 $("si").onclick=async()=>{if(!sb)return $("am").textContent="Add your Supabase keys in config.js first.";const r=await sb.auth.signInWithPassword({email:$("em").value,password:$("pw").value});r.error?$("am").textContent=r.error.message:setU(r.data.user)};
 $("su").onclick=async()=>{if(!sb)return $("am").textContent="Add your Supabase keys in config.js first.";const r=await sb.auth.signUp({email:$("em").value,password:$("pw").value});$("am").textContent=r.error?r.error.message:"Account created. Confirm your email if asked, then sign in."};
 $("so").onclick=async()=>{await sb.auth.signOut();setU(null)};
@@ -113,6 +117,12 @@ $("sa").onclick=()=>{sched.push({day:"Mon",time:"20:00",title:""});seUI()};
 $("ss").onclick=async()=>{const r=await sb.from("site").upsert({key:"schedule",value:sched});$("sm").textContent=r.error?r.error.message:"Published";loadPublic()};
 $("gs").onclick=async()=>{goal=+$("gi").value||0;await sb.from("site").upsert({key:"goal",value:{target:goal}});goalUI()};
 /* start */
+try{const k=JSON.parse(localStorage.getItem("kf")||"null");if(k){subs=k.s;$("subs").textContent=k.s.toLocaleString();$("views").textContent=k.v.toLocaleString();$("vids").textContent=k.n}}catch(e){}
+goalUI();
+const cube=$("cube"),still=matchMedia("(prefers-reduced-motion:reduce)").matches;let face=0,auto;
+const adv=()=>{face++;cube.style.transform=`rotateY(${-90*face}deg)`},arm=()=>{if(!still){clearInterval(auto);auto=setInterval(adv,5000)}};
+cube.onclick=()=>{adv();arm()};cube.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();adv();arm()}};arm();
+if(!still){const st=$("stage"),ti=$("tilt");st.onpointermove=e=>{const r=st.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;ti.style.transform=`rotateX(${-y*18}deg) rotateY(${x*24}deg)`};st.onpointerleave=()=>{ti.style.transform=""}}
 yt();setInterval(yt,60000);
 if(sb){loadPublic();sb.auth.getSession().then(r=>setU(r.data.session&&r.data.session.user))}
 else $("sch").textContent="Add your Supabase keys in config.js to show the schedule.";

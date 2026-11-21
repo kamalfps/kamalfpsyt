@@ -1,0 +1,40 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap");
+/* KamalFPS shared theme: ink #0a0c14, panel #121628, line #232842, text #eaecf5, muted #8f95b2, accent #7c8cff */
+:root{color-scheme:dark;--bg:#0a0c14;--card:rgba(18,22,40,.78);--bd:#232842;--tx:#eaecf5;--mut:#8f95b2;--ac:#7c8cff;--ok:#3ddc97}
+body{background:radial-gradient(ellipse 80% 50% at 50% -10%,#1b2160,transparent 70%),var(--bg);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh}
+body::before{content:"";position:fixed;left:-30%;right:-30%;bottom:-8%;height:55vh;z-index:-1;pointer-events:none;
+ background:linear-gradient(rgba(124,140,255,.22) 1px,transparent 1px) 0 0/54px 54px,linear-gradient(90deg,rgba(124,140,255,.22) 1px,transparent 1px) 0 0/54px 54px;
+ transform:perspective(520px) rotateX(64deg);transform-origin:bottom;-webkit-mask-image:linear-gradient(to top,#000,transparent);mask-image:linear-gradient(to top,#000,transparent);animation:flow 5s linear infinite}
+@keyframes flow{to{background-position:0 54px,0 0}}
+h1,h2,.brand,.name{font-family:"Space Grotesk",system-ui,sans-serif;letter-spacing:0;text-transform:none}
+h2{font-size:1.05rem;font-weight:700}
+.card{background:var(--card);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--bd);border-radius:14px}
+button,input,select,textarea{border-radius:8px}
+.p{clip-path:none;background:var(--ac);border-color:var(--ac);color:#06080f;font-weight:600}
+canvas{border-radius:10px}
+.brand{color:var(--tx);font-size:1.5rem;font-weight:700}.brand+div a,aside a{color:var(--ac)}
+nav button.on{border-left-color:var(--ac)}
+.stats{border-radius:10px;overflow:hidden}
+/* 3D hero (home) */
+.hero3d{display:grid;grid-template-columns:1.05fr 1fr;gap:10px;align-items:center;margin-bottom:16px;min-height:340px}
+.intro img{width:64px;height:64px;border-radius:50%;border:2px solid var(--ac);background:var(--bd);margin-bottom:14px}
+.name{font-size:clamp(2.2rem,7vw,3.4rem);font-weight:700;line-height:1.05;margin:6px 0 8px}
+.live{display:flex;gap:8px;align-items:center;color:var(--mut);font-size:.9rem}
+.live i{width:8px;height:8px;border-radius:50%;background:var(--ok);animation:ping 2s infinite}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(61,220,151,.6)}100%{box-shadow:0 0 0 10px rgba(61,220,151,0)}}
+.btn{display:inline-block;margin-top:6px;background:var(--ac);color:#06080f;padding:10px 20px;border-radius:8px;font-weight:700;text-decoration:none}
+.stage{perspective:900px;display:grid;place-items:center;position:relative;min-height:300px}
+.stage::before{content:"";position:absolute;width:55%;height:26px;bottom:14px;background:radial-gradient(closest-side,rgba(124,140,255,.55),transparent);filter:blur(6px)}
+.tilt{transform-style:preserve-3d;transition:transform .25s ease-out}
+.cube{--s:min(220px,56vw);width:var(--s);height:var(--s);position:relative;transform-style:preserve-3d;transition:transform 1.1s cubic-bezier(.6,0,.2,1);cursor:pointer}
+.cube:focus-visible{outline:2px solid var(--ac);outline-offset:14px}
+.face{position:absolute;inset:0;display:grid;place-content:center;gap:4px;text-align:center;border:1px solid rgba(124,140,255,.55);border-radius:16px;
+ background:linear-gradient(145deg,rgba(124,140,255,.28),rgba(14,17,32,.9));box-shadow:inset 0 0 44px rgba(124,140,255,.18);backface-visibility:hidden}
+.face b{font:700 clamp(1.5rem,5vw,2.2rem) "Space Grotesk",sans-serif;font-variant-numeric:tabular-nums}.face span{color:var(--mut);font-size:.85rem}
+.f1{transform:translateZ(calc(var(--s)/2))}.f2{transform:rotateY(90deg) translateZ(calc(var(--s)/2))}
+.f3{transform:rotateY(180deg) translateZ(calc(var(--s)/2))}.f4{transform:rotateY(270deg) translateZ(calc(var(--s)/2))}
+.grow{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}.chips span{border:1px solid var(--bd);border-radius:20px;padding:2px 11px;font-size:.8rem;color:var(--mut)}
+.chips span.on{background:var(--ac);border-color:var(--ac);color:#06080f;font-weight:600}
+@media(max-width:700px){.hero3d{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){body::before,.live i{animation:none}.cube,.tilt{transition:none}}
