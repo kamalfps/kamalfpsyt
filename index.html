@@ -1,162 +1,32 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KamalFPS | Road to 2027</title>
-<meta name="theme-color" content="#07060d">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="theme.css">
-<style>
-:root{--bg:#07060d;--ink:#f4f2ff;--mut:#9a96b8;--a:#7c5cff;--b:#00e5ff;--c:#ff3d81;--glass:rgba(255,255,255,.045);--line:rgba(255,255,255,.1)}
-html{scroll-behavior:smooth}
-body{background:var(--bg)!important;color:var(--ink);font-family:Inter,system-ui,sans-serif;overflow-x:hidden}
-#fx{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
-.aurora{z-index:0}
-.wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 20px 80px}
-.hide{display:none!important}
-.mut{color:var(--mut)}
-
-/* hero */
-.hero{padding:clamp(48px,9vw,110px) 0 40px;text-align:center}
-.pill{display:inline-flex;align-items:center;gap:10px;padding:8px 16px;border:1px solid var(--line);border-radius:99px;background:var(--glass);backdrop-filter:blur(12px);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
-.pill i{width:9px;height:9px;border-radius:50%;background:#ff2d55;box-shadow:0 0 0 0 rgba(255,45,85,.7);animation:ping 1.6s infinite}
-@keyframes ping{70%{box-shadow:0 0 0 12px rgba(255,45,85,0)}100%{box-shadow:0 0 0 0 rgba(255,45,85,0)}}
-.hero h1{font-family:'Space Grotesk',Inter,sans-serif;font-weight:700;font-size:clamp(34px,6.4vw,76px);line-height:1.04;letter-spacing:-.03em;margin:26px auto 0;max-width:15ch}
-.hero h1 em{font-style:normal;background:linear-gradient(100deg,var(--b),var(--a) 45%,var(--c));-webkit-background-clip:text;background-clip:text;color:transparent;background-size:200% 100%;animation:flow 6s linear infinite}
-@keyframes flow{to{background-position:-200% 0}}
-.sub{margin:18px auto 0;max-width:46ch;color:var(--mut);font-size:clamp(15px,2vw,18px)}
-
-/* stats */
-.stats{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;margin:44px 0 0;text-align:left}
-.k{position:relative;border:1px solid var(--line);border-radius:24px;background:var(--glass);backdrop-filter:blur(16px);padding:28px;overflow:hidden;transition:transform .25s,border-color .25s}
-.k::before{content:"";position:absolute;inset:0;background:radial-gradient(420px circle at var(--mx,50%) var(--my,0%),rgba(124,92,255,.22),transparent 60%);opacity:0;transition:opacity .3s;pointer-events:none}
-.k:hover{border-color:rgba(124,92,255,.5);transform:translateY(-3px)}.k:hover::before{opacity:1}
-.k .lab{display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
-.k .lab .dot{width:8px;height:8px;border-radius:50%;background:#2dffa6;box-shadow:0 0 12px #2dffa6}
-.k .num{font-family:'Space Grotesk',sans-serif;font-weight:700;font-variant-numeric:tabular-nums}
-#subs{font-size:clamp(52px,9vw,104px);line-height:1;margin-top:14px;background:linear-gradient(180deg,#fff,#b9a9ff);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 24px rgba(124,92,255,.45))}
-.ringbox{display:flex;align-items:center;gap:22px}
-.ring{width:128px;height:128px;flex:none;position:relative}
-.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
-.ring circle{fill:none;stroke-width:9;stroke-linecap:round}
-.ring .t{stroke:rgba(255,255,255,.08)}
-.ring .p{stroke:url(#g);stroke-dasharray:327;stroke-dashoffset:327;transition:stroke-dashoffset 1.8s cubic-bezier(.2,.8,.2,1)}
-.ring b{position:absolute;inset:0;display:grid;place-items:center;font:700 30px 'Space Grotesk',sans-serif}
-.ringbox p{font-size:14px;color:var(--mut);line-height:1.5}
-
-/* goal */
-#gl{margin-top:18px;padding:22px 28px}
-.bar{height:14px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden;position:relative}
-.bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--b),var(--a),var(--c));box-shadow:0 0 18px rgba(124,92,255,.7);transition:width 1.6s cubic-bezier(.2,.8,.2,1);position:relative;overflow:hidden}
-.bar i::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.55) 50%,transparent 70%);transform:translateX(-100%);animation:shine 2.6s infinite}
-@keyframes shine{to{transform:translateX(100%)}}
-.gh{display:flex;justify-content:space-between;margin-bottom:12px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
-#yerr:empty{display:none}#yerr{margin-top:14px;font-size:13px}
-
-/* cta */
-.cta{margin-top:34px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
-.btn2{position:relative;display:inline-flex;align-items:center;gap:10px;padding:16px 30px;border-radius:99px;font-weight:600;font-size:16px;color:#fff;text-decoration:none;background:linear-gradient(100deg,#ff2d55,var(--c) 50%,var(--a));box-shadow:0 10px 40px -8px rgba(255,61,129,.7);overflow:hidden;transition:transform .2s,box-shadow .2s}
-.btn2::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.4) 50%,transparent 70%);transform:translateX(-120%);transition:transform .7s}
-.btn2:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 16px 50px -6px rgba(255,61,129,.9)}.btn2:hover::after{transform:translateX(120%)}
-.btn2.ghost{background:var(--glass);border:1px solid var(--line);box-shadow:none;backdrop-filter:blur(12px)}
-.btn2 svg{width:20px;height:20px}
-
-/* marquee */
-.marq{margin:56px -20px 0;overflow:hidden;border-block:1px solid var(--line);padding:16px 0;mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
-#mq{display:flex;gap:46px;width:max-content;animation:mq 34s linear infinite}
-#mq span{font:700 clamp(18px,3vw,28px) 'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:.06em;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.35);white-space:nowrap}
-#mq span:nth-child(4n+2){-webkit-text-stroke:0;color:var(--b)}
-@keyframes mq{to{transform:translateX(-50%)}}
-
-/* cards */
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:44px}
-.k h2{font:700 22px 'Space Grotesk',sans-serif;margin:0 0 18px;display:flex;align-items:center;gap:10px}
-.k h2::before{content:"";width:6px;height:22px;border-radius:4px;background:linear-gradient(var(--b),var(--a))}
-.krow{display:flex;align-items:center;gap:14px;padding:13px 0;border-top:1px solid var(--line);font-size:15px}
-.krow:first-of-type{border-top:0}
-.krow a{color:var(--ink);text-decoration:none;flex:1;transition:color .2s}.krow a:hover{color:var(--b)}
-.krow .rk{font:700 20px 'Space Grotesk',sans-serif;width:28px;color:var(--a)}
-.krow .vw{font-size:13px;color:var(--mut);white-space:nowrap}
-.krow .when{font:600 13px Inter;padding:6px 12px;border-radius:99px;background:rgba(124,92,255,.16);color:#cfc4ff;white-space:nowrap}
-.krow span.ti{flex:1}
-
-/* reveal */
-.rv{opacity:0;transform:translateY(28px);transition:opacity .8s,transform .8s cubic-bezier(.2,.8,.2,1)}
-.rv.in{opacity:1;transform:none}
-
-@media(max-width:760px){.stats,.grid2{grid-template-columns:1fr}.ringbox{flex-direction:row}.k{padding:22px}}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-</style></head><body>
-
-<canvas id="fx"></canvas>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KamalFPS</title><link rel="stylesheet" href="theme.css"></head><body>
 <div class="aurora"><i></i><i></i><i></i></div>
-
 <div class="wrap"><nav class="top" id="top"></nav>
-
 <section class="hero">
-<span class="pill rv"><i></i>Live on the road to 2027</span>
-<h1 class="rv">Becoming <em>famous</em> before 2027, one stream at a time.</h1>
-<p class="sub rv">Every sub counts. Watch the numbers climb in real time.</p>
-
-<div class="stats">
-<div class="k rv"><div class="lab"><span class="dot"></span>Live subscribers</div><div class="num" id="subs">0</div></div>
-<div class="k rv"><div class="lab">Days left in 2026</div>
-<div class="ringbox" style="margin-top:14px">
-<div class="ring"><svg viewBox="0 0 120 120"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff3d81"/></linearGradient></defs><circle class="t" cx="60" cy="60" r="52"/><circle class="p" id="rp" cx="60" cy="60" r="52"/></svg><b class="num" id="days">0</b></div>
-<p>The clock is ticking. Subscribe now and be here from the start.</p></div></div>
-</div>
-
-<div id="gl" class="k hide rv"><div class="gh"><span>Next goal</span><span id="gp"></span></div><div class="bar"><i id="gb"></i></div><div class="mut" id="gt" style="margin-top:12px;font-size:14px"></div></div>
-<p id="yerr" class="mut"></p>
-
-<div class="cta rv">
-<a class="btn2" href="https://youtube.com/@kamalfps?sub_confirmation=1"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23 7.2a3 3 0 0 0-2.1-2.1C19 4.6 12 4.6 12 4.6s-7 0-8.9.5A3 3 0 0 0 1 7.2C.5 9 .5 12 .5 12s0 3 .5 4.8a3 3 0 0 0 2.1 2.1c1.9.5 8.9.5 8.9.5s7 0 8.9-.5a3 3 0 0 0 2.1-2.1c.5-1.8.5-4.8.5-4.8s0-3-.5-4.8zM9.7 15.5v-7l6 3.5-6 3.5z"/></svg>Subscribe on YouTube</a>
-<a class="btn2 ghost" href="#more">See schedule &amp; top videos ↓</a>
-</div>
+ <h1>Becoming famous before 2027, one stream at a time.</h1>
+ <div class="counts"><div><div class="lab"><span class="dot"></span>Live subscribers</div><div class="num" id="subs">0</div></div>
+  <div class="small"><div class="lab">Days left in 2026</div><div class="num" id="days">0</div></div></div>
+ <div id="gl" class="hide"><div class="bar"><i id="gb"></i></div><div class="mut" id="gt" style="margin-top:10px"></div></div>
+ <p id="yerr" class="mut"></p>
+ <a class="btn" href="https://youtube.com/@kamalfps?sub_confirmation=1">Subscribe on YouTube</a>
 </section>
-
 <div class="marq"><div id="mq"></div></div>
-
-<section class="grid2" id="more"><div class="k rv"><h2>Stream schedule</h2><div id="sch" class="mut">No streams scheduled yet.</div></div>
-<div class="k rv"><h2>Top videos</h2><div id="top5" class="mut">Loading…</div></div></section></div>
-
+<section class="grid2"><div class="card rv"><h2>Stream schedule</h2><div id="sch" class="mut">No streams scheduled yet.</div></div>
+<div class="card rv"><h2>Top videos</h2><div id="top5" class="mut">Loading…</div></div></section></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script><script src="config.js"></script><script src="app.js"></script>
-
 <script>
 let subs=0,goal=0,first=true;
-const YEAR_DAYS=365;
-function setRing(){const d=DAYS_LEFT();$("rp").style.strokeDashoffset=327*(1-Math.min(1,d/YEAR_DAYS))}
-countTo($("days"),DAYS_LEFT());setTimeout(setRing,300);
-$("mq").innerHTML=Array(8).fill(["Road to 2027",DAYS_LEFT()+" days left","Live streams","KamalFPS"]).flat().map(x=>`<span>${x}</span>`).join("");
-
+countTo($("days"),DAYS_LEFT());
+$("mq").innerHTML=Array(8).fill([ "Road to 2027",DAYS_LEFT()+" days left","Live streams","KamalFPS"]).flat().map(x=>`<span>${x}</span>`).join("");
 function goalUI(){const g=$("gl");if(!goal){g.classList.add("hide");return}g.classList.remove("hide");
-const pc=Math.min(100,subs/goal*100);requestAnimationFrame(()=>{$("gb").style.width=pc+"%"});
-$("gp").textContent=pc.toFixed(1)+"%";
-$("gt").textContent=subs>=goal?`Goal of ${goal.toLocaleString()} reached. Next goal coming soon.`:`${subs.toLocaleString()} of ${goal.toLocaleString()} subscribers, ${(goal-subs).toLocaleString()} to go`}
-
+ requestAnimationFrame(()=>{$("gb").style.width=Math.min(100,subs/goal*100)+"%"});
+ $("gt").textContent=subs>=goal?`Goal of ${goal.toLocaleString()} reached. Next goal coming soon.`:`${subs.toLocaleString()} of ${goal.toLocaleString()} subscribers, ${(goal-subs).toLocaleString()} to go`}
 try{const k=JSON.parse(localStorage.getItem("kf")||"null");if(k){subs=k;$("subs").textContent=k.toLocaleString()}}catch(e){}
-
 async function tick(){try{const c=await ytChannel(true);$("yerr").textContent="";subs=c.subs;
-if(c.hidden)$("subs").textContent="Hidden";else if(first)countTo($("subs"),subs);else $("subs").textContent=subs.toLocaleString();
-first=false;try{localStorage.setItem("kf",JSON.stringify(subs))}catch(e){}goalUI();
-$("top5").innerHTML=c.top.map((i,n)=>`<div class="krow"><span class="rk">${n+1}</span><a href="https://youtu.be/${i.id}">${E(i.snippet.title)}</a><span class="vw">${(+i.statistics.viewCount).toLocaleString()} views</span></div>`).join("")||"No videos yet."}
-catch(e){$("yerr").textContent="Live count unavailable: "+e.message}}
-
+  if(c.hidden)$("subs").textContent="Hidden";else if(first)countTo($("subs"),subs);else $("subs").textContent=subs.toLocaleString();
+  first=false;try{localStorage.setItem("kf",JSON.stringify(subs))}catch(e){}goalUI();
+  $("top5").innerHTML=c.top.map(i=>`<div class="row"><a href="https://youtu.be/${i.id}">${E(i.snippet.title)}</a><span class="mut">${(+i.statistics.viewCount).toLocaleString()} views</span></div>`).join("")||"No videos yet."}
+ catch(e){$("yerr").textContent="Live count unavailable: "+e.message}}
 (async()=>{const g=await site("goal");goal=g?+g.target:0;goalUI();const s=await site("schedule");
-if(s&&s.length)$("sch").innerHTML=s.map(x=>`<div class="krow"><span class="when">${E(x.day)} ${E(x.time)}</span><span class="ti">${E(x.title)}</span></div>`).join("")})();
+ if(s&&s.length)$("sch").innerHTML=s.map(x=>`<div class="row"><b>${E(x.day)} ${E(x.time)}</b><span>${E(x.title)}</span></div>`).join("")})();
 tick();setInterval(tick,60000);
-
-/* scroll reveal */
-const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.12});
-document.querySelectorAll(".rv").forEach((el,i)=>{el.style.transitionDelay=(i%4)*90+"ms";io.observe(el)});
-
-/* card spotlight follows cursor */
-document.addEventListener("pointermove",e=>{const c=e.target.closest&&e.target.closest(".k");if(!c)return;const r=c.getBoundingClientRect();c.style.setProperty("--mx",e.clientX-r.left+"px");c.style.setProperty("--my",e.clientY-r.top+"px")});
-
-/* floating star particles that react to the cursor */
-(()=>{const cv=$("fx"),x=cv.getContext("2d");let W,H,m={x:-999,y:-999};
-const P=Array.from({length:70},()=>({x:Math.random(),y:Math.random(),r:Math.random()*1.6+.4,s:Math.random()*.25+.05,h:Math.random()>.5?190:280}));
-function rs(){W=cv.width=innerWidth;H=cv.height=innerHeight}rs();addEventListener("resize",rs);
-addEventListener("pointermove",e=>{m.x=e.clientX;m.y=e.clientY});
-(function f(){x.clearRect(0,0,W,H);for(const p of P){p.y-=p.s/H*60;if(p.y<0){p.y=1;p.x=Math.random()}
-let px=p.x*W,py=p.y*H,dx=px-m.x,dy=py-m.y,d=Math.hypot(dx,dy);if(d<120){px+=dx/d*(120-d)*.4;py+=dy/d*(120-d)*.4}
-x.beginPath();x.arc(px,py,p.r,0,7);x.fillStyle=`hsla(${p.h},100%,75%,.7)`;x.shadowBlur=10;x.shadowColor=`hsl(${p.h},100%,65%)`;x.fill()}
-requestAnimationFrame(f)})()})();
 </script></body></html>
