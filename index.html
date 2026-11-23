@@ -1,32 +1,166 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KamalFPS</title><link rel="stylesheet" href="theme.css"></head><body>
-<div class="aurora"><i></i><i></i><i></i></div>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KamalFPS | Road to 2027</title>
+<meta name="theme-color" content="#0a0a0b">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
+<style>
+:root{--bg:#0a0a0b;--ink:#f3eee4;--mut:#8d887c;--gold:#e8c987;--gold2:#b8935a;--line:rgba(243,238,228,.12);--serif:'Instrument Serif',Georgia,serif;--sans:Inter,system-ui,sans-serif}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg)!important;color:var(--ink);font-family:var(--sans);font-weight:300;margin:0;overflow-x:hidden}
+.aurora{display:none!important}
+.hide{display:none!important}
+.mut{color:var(--mut)}
+/* atmosphere */
+#spot{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(600px circle at var(--x,50%) var(--y,20%),rgba(232,201,135,.09),transparent 65%)}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(900px 500px at 50% -10%,rgba(184,147,90,.18),transparent 70%)}
+body::after{content:"";position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.07;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+.lines{position:fixed;inset:0;z-index:0;pointer-events:none;display:flex;justify-content:center;gap:calc((min(1100px,100vw) - 2px)/4)}
+.lines i{width:1px;background:linear-gradient(transparent,var(--line) 30%,var(--line) 70%,transparent)}
+.wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 24px 90px}
+
+/* hero */
+.hero{text-align:center;padding:clamp(40px,8vw,96px) 0 20px}
+.eyebrow{display:inline-flex;align-items:center;gap:12px;font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold)}
+.eyebrow::before,.eyebrow::after{content:"";width:44px;height:1px;background:linear-gradient(90deg,transparent,var(--gold))}
+.eyebrow::after{transform:scaleX(-1)}
+h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,7.4vw,98px);line-height:1;letter-spacing:-.02em;margin:28px auto 0;max-width:14ch}
+h1 .w{display:inline-block;opacity:0;transform:translateY(40px);filter:blur(10px);animation:up 1.1s cubic-bezier(.2,.8,.2,1) forwards}
+h1 em{font-style:italic;color:var(--gold)}
+@keyframes up{to{opacity:1;transform:none;filter:none}}
+
+/* counter stage */
+.stage{position:relative;margin:clamp(40px,7vw,80px) auto 0;padding:clamp(34px,6vw,64px) 20px;max-width:880px}
+.stage::before,.stage::after{content:"";position:absolute;width:26px;height:26px;border:1px solid var(--gold2);opacity:.7}
+.stage::before{left:0;top:0;border-right:0;border-bottom:0}
+.stage::after{right:0;bottom:0;border-left:0;border-top:0}
+.stage .c1,.stage .c2{position:absolute;width:26px;height:26px;border:1px solid var(--gold2);opacity:.7}
+.stage .c1{right:0;top:0;border-left:0;border-bottom:0}.stage .c2{left:0;bottom:0;border-right:0;border-top:0}
+.lab{display:inline-flex;align-items:center;gap:10px;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--mut)}
+.dot{width:7px;height:7px;border-radius:50%;background:#5dffb0;box-shadow:0 0 0 0 rgba(93,255,176,.6);animation:pl 2s infinite}
+@keyframes pl{70%{box-shadow:0 0 0 10px rgba(93,255,176,0)}100%{box-shadow:0 0 0 0 rgba(93,255,176,0)}}
+#subs{display:block;font-family:var(--serif);font-weight:400;font-size:clamp(84px,19vw,230px);line-height:.95;letter-spacing:-.04em;margin:10px 0 0;font-variant-numeric:tabular-nums;background:linear-gradient(180deg,#fff7e3 10%,var(--gold) 55%,var(--gold2));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 40px rgba(232,201,135,.25))}
+
+/* timeline */
+.time{margin:clamp(34px,5vw,56px) auto 0;max-width:880px;text-align:left}
+.th{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:18px}
+.th .big{font-family:var(--serif);font-size:clamp(30px,4vw,44px);line-height:1}
+.th .big #days{font-style:italic;color:var(--gold)}
+.track{position:relative;height:1px;background:var(--line)}
+.track .fill{position:absolute;left:0;top:-1px;height:3px;width:0;background:linear-gradient(90deg,transparent,var(--gold));border-radius:3px;transition:width 2.2s cubic-bezier(.2,.8,.2,1)}
+.track .now{position:absolute;top:-6px;left:0;width:13px;height:13px;margin-left:-6px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 5px rgba(232,201,135,.18),0 0 24px var(--gold);transition:left 2.2s cubic-bezier(.2,.8,.2,1)}
+.months{display:flex;justify-content:space-between;margin-top:16px;font-size:10px;letter-spacing:.2em;color:var(--mut);text-transform:uppercase}
+
+/* goal */
+#gl{margin:46px auto 0;max-width:880px;text-align:left}
+.gh{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--mut);margin-bottom:14px}
+.gh b{color:var(--gold);font-weight:500}
+.bar{height:2px;background:var(--line);position:relative}
+.bar i{position:absolute;left:0;top:-1px;height:4px;width:0;background:linear-gradient(90deg,var(--gold2),var(--gold),#fff7e3);box-shadow:0 0 18px rgba(232,201,135,.6);transition:width 1.8s cubic-bezier(.2,.8,.2,1)}
+#gt{margin-top:14px;font-size:14px;color:var(--mut)}
+#yerr{margin:18px 0 0;font-size:13px}#yerr:empty{display:none}
+
+/* cta */
+.cta{margin-top:clamp(36px,5vw,56px);display:flex;gap:26px;justify-content:center;align-items:center;flex-wrap:wrap}
+.btn2{position:relative;display:inline-flex;align-items:center;gap:14px;padding:18px 34px;border-radius:99px;background:var(--gold);color:#17120a;font-weight:500;font-size:15px;letter-spacing:.04em;text-decoration:none;overflow:hidden;transition:transform .3s,box-shadow .3s;box-shadow:0 14px 50px -12px rgba(232,201,135,.6)}
+.btn2::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.65) 50%,transparent 70%);transform:translateX(-120%);transition:transform .8s}
+.btn2:hover{transform:translateY(-3px);box-shadow:0 22px 60px -10px rgba(232,201,135,.8)}.btn2:hover::after{transform:translateX(120%)}
+.btn2 span{transition:transform .3s}.btn2:hover span{transform:translateX(5px)}
+.link{color:var(--ink);text-decoration:none;font-size:14px;letter-spacing:.04em;border-bottom:1px solid var(--line);padding-bottom:4px;transition:.3s}.link:hover{color:var(--gold);border-color:var(--gold)}
+
+/* marquee */
+.marq{margin:clamp(60px,9vw,110px) -24px 0;overflow:hidden;border-block:1px solid var(--line);padding:22px 0;mask-image:linear-gradient(90deg,transparent,#000 15%,#000 85%,transparent)}
+#mq{display:flex;gap:56px;width:max-content;animation:mq 40s linear infinite}
+#mq span{font:italic 400 clamp(26px,4vw,46px) var(--serif);color:rgba(243,238,228,.28);white-space:nowrap;display:flex;align-items:center;gap:56px}
+#mq span::after{content:"✦";font-style:normal;font-size:.5em;color:var(--gold2)}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+/* lists */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:clamp(30px,6vw,90px);margin-top:clamp(60px,9vw,110px)}
+.col h2{font:400 clamp(30px,4vw,44px) var(--serif);margin:0 0 6px;display:flex;align-items:baseline;gap:14px}
+.col h2 small{font:500 11px var(--sans);letter-spacing:.3em;color:var(--gold);text-transform:uppercase}
+.col>div{border-top:1px solid var(--line);margin-top:18px}
+.krow{display:flex;align-items:center;gap:18px;padding:20px 0;border-bottom:1px solid var(--line);transition:padding .35s,background .35s;font-size:15px}
+.krow:hover{padding-left:14px;background:linear-gradient(90deg,rgba(232,201,135,.07),transparent)}
+.krow a{flex:1;color:var(--ink);text-decoration:none;transition:color .3s}.krow:hover a{color:var(--gold)}
+.rk{font:italic 400 34px var(--serif);width:38px;color:var(--gold2);line-height:1}
+.vw{font-size:12px;color:var(--mut);letter-spacing:.06em;white-space:nowrap}
+.when{font:500 11px var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--gold);min-width:104px}
+.ti{flex:1;font-family:var(--serif);font-size:22px}
+.col>.mut{padding:22px 0}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(30px);transition:opacity 1s,transform 1s cubic-bezier(.2,.8,.2,1)}
+.rv.in{opacity:1;transform:none}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}.lines i:nth-child(odd){display:none}.months span:nth-child(even){display:none}.when{min-width:84px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}h1 .w{opacity:1;transform:none;filter:none}}
+</style></head><body>
+
+<div id="spot"></div><div class="lines"><i></i><i></i><i></i><i></i><i></i></div>
+
 <div class="wrap"><nav class="top" id="top"></nav>
+
 <section class="hero">
- <h1>Becoming famous before 2027, one stream at a time.</h1>
- <div class="counts"><div><div class="lab"><span class="dot"></span>Live subscribers</div><div class="num" id="subs">0</div></div>
-  <div class="small"><div class="lab">Days left in 2026</div><div class="num" id="days">0</div></div></div>
- <div id="gl" class="hide"><div class="bar"><i id="gb"></i></div><div class="mut" id="gt" style="margin-top:10px"></div></div>
- <p id="yerr" class="mut"></p>
- <a class="btn" href="https://youtube.com/@kamalfps?sub_confirmation=1">Subscribe on YouTube</a>
+<div class="eyebrow">KamalFPS &nbsp;·&nbsp; Live</div>
+<h1 id="hl">Becoming <em>famous</em> before 2027, one stream at a time.</h1>
+
+<div class="stage rv"><i class="c1"></i><i class="c2"></i>
+<div class="lab"><span class="dot"></span>Live subscribers</div>
+<div class="num" id="subs">0</div></div>
+
+<div class="time rv">
+<div class="th"><div class="big"><span id="days">0</span> days left in 2026</div><div class="lab" id="pct"></div></div>
+<div class="track"><div class="fill" id="tf"></div><div class="now" id="tn"></div></div>
+<div class="months"><span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span></div>
+</div>
+
+<div id="gl" class="hide rv"><div class="gh"><span>Next milestone</span><b id="gp"></b></div><div class="bar"><i id="gb"></i></div><div id="gt"></div></div>
+<p id="yerr" class="mut"></p>
+
+<div class="cta rv">
+<a class="btn2" href="https://youtube.com/@kamalfps?sub_confirmation=1">Subscribe on YouTube <span>→</span></a>
+<a class="link" href="#more">Schedule &amp; top videos</a>
+</div>
 </section>
+
 <div class="marq"><div id="mq"></div></div>
-<section class="grid2"><div class="card rv"><h2>Stream schedule</h2><div id="sch" class="mut">No streams scheduled yet.</div></div>
-<div class="card rv"><h2>Top videos</h2><div id="top5" class="mut">Loading…</div></div></section></div>
+
+<section class="grid2" id="more">
+<div class="col rv"><h2>Stream schedule <small>Upcoming</small></h2><div id="sch" class="mut">No streams scheduled yet.</div></div>
+<div class="col rv"><h2>Top videos <small>Most watched</small></h2><div id="top5" class="mut">Loading…</div></div>
+</section></div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script><script src="config.js"></script><script src="app.js"></script>
+
 <script>
 let subs=0,goal=0,first=true;
-countTo($("days"),DAYS_LEFT());
-$("mq").innerHTML=Array(8).fill([ "Road to 2027",DAYS_LEFT()+" days left","Live streams","KamalFPS"]).flat().map(x=>`<span>${x}</span>`).join("");
+/* headline: word-by-word entrance */
+(()=>{const h=$("hl");const walk=n=>{[...n.childNodes].forEach(c=>{if(c.nodeType===3){const f=document.createDocumentFragment();c.textContent.split(/(\s+)/).forEach(t=>{if(!t.trim()){f.append(t);return}const s=document.createElement("span");s.className="w";s.textContent=t;f.append(s)});c.replaceWith(f)}else walk(c)})};walk(h);h.querySelectorAll(".w").forEach((w,i)=>w.style.animationDelay=.15+i*.09+"s")})();
+
+/* year timeline */
+function yearUI(){const d=DAYS_LEFT(),p=Math.max(0,Math.min(100,(365-d)/365*100));
+setTimeout(()=>{$("tf").style.width=p+"%";$("tn").style.left=p+"%"},400);$("pct").textContent=p.toFixed(0)+"% of the year gone"}
+countTo($("days"),DAYS_LEFT());yearUI();
+$("mq").innerHTML=Array(8).fill(["Road to 2027",DAYS_LEFT()+" days left","Live streams","KamalFPS"]).flat().map(x=>`<span>${x}</span>`).join("");
+
 function goalUI(){const g=$("gl");if(!goal){g.classList.add("hide");return}g.classList.remove("hide");
- requestAnimationFrame(()=>{$("gb").style.width=Math.min(100,subs/goal*100)+"%"});
- $("gt").textContent=subs>=goal?`Goal of ${goal.toLocaleString()} reached. Next goal coming soon.`:`${subs.toLocaleString()} of ${goal.toLocaleString()} subscribers, ${(goal-subs).toLocaleString()} to go`}
+const pc=Math.min(100,subs/goal*100);requestAnimationFrame(()=>{$("gb").style.width=pc+"%"});$("gp").textContent=pc.toFixed(1)+"%";
+$("gt").textContent=subs>=goal?`Goal of ${goal.toLocaleString()} reached. Next goal coming soon.`:`${subs.toLocaleString()} of ${goal.toLocaleString()} subscribers, ${(goal-subs).toLocaleString()} to go`}
+
 try{const k=JSON.parse(localStorage.getItem("kf")||"null");if(k){subs=k;$("subs").textContent=k.toLocaleString()}}catch(e){}
+
 async function tick(){try{const c=await ytChannel(true);$("yerr").textContent="";subs=c.subs;
-  if(c.hidden)$("subs").textContent="Hidden";else if(first)countTo($("subs"),subs);else $("subs").textContent=subs.toLocaleString();
-  first=false;try{localStorage.setItem("kf",JSON.stringify(subs))}catch(e){}goalUI();
-  $("top5").innerHTML=c.top.map(i=>`<div class="row"><a href="https://youtu.be/${i.id}">${E(i.snippet.title)}</a><span class="mut">${(+i.statistics.viewCount).toLocaleString()} views</span></div>`).join("")||"No videos yet."}
- catch(e){$("yerr").textContent="Live count unavailable: "+e.message}}
+if(c.hidden)$("subs").textContent="Hidden";else if(first)countTo($("subs"),subs);else $("subs").textContent=subs.toLocaleString();
+first=false;try{localStorage.setItem("kf",JSON.stringify(subs))}catch(e){}goalUI();
+$("top5").innerHTML=c.top.map((i,n)=>`<div class="krow"><span class="rk">${n+1}</span><a href="https://youtu.be/${i.id}">${E(i.snippet.title)}</a><span class="vw">${(+i.statistics.viewCount).toLocaleString()} views</span></div>`).join("")||"No videos yet."}
+catch(e){$("yerr").textContent="Live count unavailable: "+e.message}}
+
 (async()=>{const g=await site("goal");goal=g?+g.target:0;goalUI();const s=await site("schedule");
- if(s&&s.length)$("sch").innerHTML=s.map(x=>`<div class="row"><b>${E(x.day)} ${E(x.time)}</b><span>${E(x.title)}</span></div>`).join("")})();
+if(s&&s.length)$("sch").innerHTML=s.map(x=>`<div class="krow"><span class="when">${E(x.day)} ${E(x.time)}</span><span class="ti">${E(x.title)}</span></div>`).join("")})();
 tick();setInterval(tick,60000);
+
+/* reveal + cursor light */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.1});
+document.querySelectorAll(".rv").forEach((el,i)=>{el.style.transitionDelay=(i%3)*120+"ms";io.observe(el)});
+addEventListener("pointermove",e=>{const s=$("spot").style;s.setProperty("--x",e.clientX+"px");s.setProperty("--y",e.clientY+"px")});
 </script></body></html>
