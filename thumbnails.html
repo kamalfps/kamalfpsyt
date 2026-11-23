@@ -1,11 +1,11 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Thumbnails · KamalFPS</title><link rel="stylesheet" href="theme.css"><style>.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}.l{display:block;font-size:.78rem;color:var(--mut);margin-bottom:4px}
-.btns{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.lb{cursor:pointer;border:1px solid var(--bd);border-radius:10px;padding:9px 14px;background:#0e1120}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.lb{cursor:pointer;border:1px solid var(--bd);border-radius:10px;padding:10px 18px;border-radius:99px;background:transparent;font-size:14px;color:var(--ink);transition:.25s}.lb:hover{border-color:var(--gold);color:var(--gold)}
 .g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-bottom:16px}.g2 .card{margin:0}
-#cv{width:100%;height:auto;display:block;border:1px solid var(--bd);touch-action:none}
+#cv{width:100%;height:auto;display:block;border:1px solid var(--bd);border-radius:14px;box-shadow:0 30px 80px -30px rgba(232,201,135,.25);touch-action:none}
 .lrow{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:5px 8px;border:1px solid var(--bd);border-radius:10px;margin-bottom:6px;cursor:pointer}.lrow.on{border-color:var(--ac)}.lrow button{padding:2px 7px;font-size:.75rem}
 input[type=range],input[type=color]{padding:0;height:32px;width:100%}textarea{width:100%}</style></head><body class="priv">
 <div class="aurora"><i></i><i></i><i></i></div>
-<main class="wrap" id="t_thumb"><nav class="top" id="top"></nav><h1>Thumbnail maker</h1><p class="mut">Everything saves in this browser. Your latest design comes back when you return.</p><div class="card"><h2>Canvas</h2>
+<main class="wrap" id="t_thumb"><nav class="top" id="top"></nav><div class="eyebrow">Design studio</div><h1>Thumbnail <em>maker</em></h1><p class="mut">Everything saves in this browser. Your latest design comes back when you return.</p><div class="card"><h2>Canvas</h2>
 <p class="mut" style="margin-top:0">Add as many texts, boxes, arrows and images as you want. Click to select, drag to move, the square corner resizes, the round handle rotates. Delete removes, arrow keys nudge, Ctrl+Z undoes.</p>
 <canvas id="cv" width="1280" height="720"></canvas>
 <div class="btns" style="justify-content:space-between"><span style="display:flex;gap:10px;align-items:center"><canvas id="pv" width="168" height="94" style="width:168px;border-radius:2px;border:1px solid var(--bd)"></canvas><span class="mut" style="font-size:.8rem">phone size<br><label><input type="checkbox" id="gd"> guides</label></span></span><span style="display:flex;gap:8px;flex-wrap:wrap"><button id="ud">Undo</button><button id="rd">Redo</button><button id="dayb">Countdown text</button><button id="exj">Download JPG</button><button class="p" id="exp2">Download PNG</button></span></div></div>
