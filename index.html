@@ -90,6 +90,29 @@ h1 em{font-style:italic;color:var(--gold)}
 .ti{flex:1;font-family:var(--serif);font-size:22px}
 .col>.mut{padding:22px 0}
 
+
+/* platforms */
+.plats{display:grid;gap:22px;margin-top:clamp(60px,9vw,110px)}
+.pc{position:relative;border:1px solid var(--line);border-radius:24px;padding:clamp(22px,4vw,38px);background:rgba(255,255,255,.03);backdrop-filter:blur(14px)}
+.pc::before{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;background:linear-gradient(135deg,var(--pc),transparent 42%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+#yt{--pc:rgba(255,45,85,.6)}#kk{--pc:rgba(83,252,24,.55)}
+.pc h2::before{display:none}.pc h2{margin:6px 0 4px}
+.ph{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.pb{display:inline-flex;padding:6px 14px;border-radius:99px;font-size:11px;letter-spacing:.26em;text-transform:uppercase;border:1px solid}
+.pb.yt{color:#ff6b88;border-color:rgba(255,45,85,.45);background:rgba(255,45,85,.08)}
+.pb.kk{color:#53fc18;border-color:rgba(83,252,24,.4);background:rgba(83,252,24,.07)}
+.fol{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--mut)}
+.fol b{font:400 clamp(34px,5vw,54px)/1 var(--serif);color:#e9ffdc;letter-spacing:0;margin-right:10px}
+#yup{margin-top:14px;border-top:1px solid var(--line)}#yup>.mut{padding:22px 0}
+#yup .when{min-width:170px}
+.lv{color:#ff6b88!important;background:rgba(255,45,85,.14)!important;animation:pl2 1.8s infinite}
+@keyframes pl2{50%{opacity:.55}}
+.kgrid{display:grid;grid-template-columns:1.7fr 1fr;gap:18px;margin-top:20px}
+.kgrid iframe{width:100%;border:1px solid var(--line);border-radius:16px;background:#050505;display:block}
+#kpl{aspect-ratio:16/9;height:auto}#kch{height:100%;min-height:440px}
+.kact{display:flex;gap:26px;flex-wrap:wrap;margin-top:18px}
+@media(max-width:760px){.kgrid{grid-template-columns:1fr}#kch{height:460px}}
+
 /* reveal */
 .rv{opacity:0;transform:translateY(30px);transition:opacity 1s,transform 1s cubic-bezier(.2,.8,.2,1)}
 .rv.in{opacity:1;transform:none}
@@ -120,14 +143,23 @@ h1 em{font-style:italic;color:var(--gold)}
 
 <div class="cta rv">
 <a class="btn2" href="https://youtube.com/@kamalfps?sub_confirmation=1">Subscribe on YouTube <span>→</span></a>
-<a class="link" href="#more">Schedule &amp; top videos</a>
+<a class="link" href="#live">Live &amp; chat</a><a class="link" href="#more">Schedule &amp; top videos</a>
 </div>
 </section>
 
 <div class="marq"><div id="mq"></div></div>
 
+<section class="plats" id="live">
+<div class="pc rv" id="yt"><div class="ph"><span class="pb yt">YouTube</span><span class="mut" id="ytst" style="font-size:13px"></span></div>
+<h2>Live &amp; upcoming streams</h2><div id="yup"><div class="mut">Checking YouTube…</div></div></div>
+<div class="pc rv" id="kk"><div class="ph"><span class="pb kk">Kick</span><span class="fol"><b class="num" id="kf">–</b>followers</span></div>
+<h2>Watch &amp; chat on Kick</h2>
+<div class="kgrid"><iframe id="kpl" title="Kick stream" loading="lazy" allowfullscreen></iframe><iframe id="kch" title="Kick chat" loading="lazy"></iframe></div>
+<div class="kact"><a class="btn2" id="kfollow" href="#" target="_blank" rel="noopener" style="background:#53fc18;box-shadow:0 14px 44px -14px rgba(83,252,24,.7)">Follow on Kick <span>→</span></a><a class="link" id="kopen" href="#" target="_blank" rel="noopener">Chat not loading? Open on Kick ↗</a></div></div>
+</section>
+
 <section class="grid2" id="more">
-<div class="col rv"><h2>Stream schedule <small>Upcoming</small></h2><div id="sch" class="mut">No streams scheduled yet.</div></div>
+<div class="col rv"><h2>Weekly schedule <small>Regular</small></h2><div id="sch" class="mut">No streams scheduled yet.</div></div>
 <div class="col rv"><h2>Top videos <small>Most watched</small></h2><div id="top5" class="mut">Loading…</div></div>
 </section></div>
 
@@ -159,6 +191,26 @@ catch(e){$("yerr").textContent="Live count unavailable: "+e.message}}
 (async()=>{const g=await site("goal");goal=g?+g.target:0;goalUI();const s=await site("schedule");
 if(s&&s.length)$("sch").innerHTML=s.map(x=>`<div class="krow"><span class="when">${E(x.day)} ${E(x.time)}</span><span class="ti">${E(x.title)}</span></div>`).join("")})();
 tick();setInterval(tick,60000);
+
+
+/* YouTube live + upcoming (uses your existing API key, ~3 quota units per refresh) */
+let _up=0,_upD=[];
+async function ytUpcoming(){if(!CFG.YT_API_KEY)throw new Error("Add your YouTube API key in config.js.");if(Date.now()-_up<3e5)return _upD;
+ const B="https://www.googleapis.com/youtube/v3/",K="&key="+CFG.YT_API_KEY;
+ const c=((await(await fetch(`${B}channels?part=contentDetails&forHandle=${encodeURIComponent(CFG.YT_HANDLE)}${K}`)).json()).items||[])[0];if(!c)throw new Error("Channel not found.");
+ const p=await(await fetch(`${B}playlistItems?part=contentDetails&maxResults=25&playlistId=${c.contentDetails.relatedPlaylists.uploads}${K}`)).json(),ids=(p.items||[]).map(i=>i.contentDetails.videoId).join(","),
+ v=ids?await(await fetch(`${B}videos?part=snippet,liveStreamingDetails&id=${ids}${K}`)).json():{items:[]};_up=Date.now();
+ return _upD=(v.items||[]).filter(x=>x.snippet.liveBroadcastContent!=="none"&&x.liveStreamingDetails).map(x=>({id:x.id,t:x.snippet.title,live:x.snippet.liveBroadcastContent==="live",at:new Date(x.liveStreamingDetails.scheduledStartTime||x.liveStreamingDetails.actualStartTime)})).sort((a,b)=>a.at-b.at)}
+async function loadUp(){try{const u=await ytUpcoming();
+ $("yup").innerHTML=u.length?u.map(x=>`<div class="krow"><span class="when${x.live?" lv":""}">${x.live?"Live now":x.at.toLocaleString([],{weekday:"short",day:"numeric",month:"short",hour:"numeric",minute:"2-digit"})}</span><a class="ti" href="https://youtu.be/${x.id}" target="_blank" rel="noopener">${E(x.t)}</a></div>`).join(""):'<div class="mut">No streams scheduled on YouTube right now. Check the weekly schedule below.</div>';
+ $("ytst").textContent=u.some(x=>x.live)?"Live now":"Times shown in your local time"}
+ catch(e){$("yup").innerHTML='<div class="mut">Couldn\'t load YouTube streams: '+E(e.message)+'</div>'}}
+loadUp();setInterval(loadUp,3e5);
+
+/* Kick: player + chat embeds, followers saved from Studio */
+(()=>{const s=encodeURIComponent(CFG.KICK_SLUG||"kamalfps"),u="https://kick.com/"+s;
+ $("kpl").src="https://player.kick.com/"+s;$("kch").src="https://kick.com/popout/"+s+"/chat";$("kfollow").href=u;$("kopen").href=u;
+ site("kick").then(k=>{if(k&&k.followers!=null)countTo($("kf"),+k.followers)}).catch(()=>{})})();
 
 /* reveal + cursor light */
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.1});

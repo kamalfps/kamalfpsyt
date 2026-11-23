@@ -6,6 +6,7 @@
 <div id="tools" class="hide">
  <div class="card"><h2>Subscriber goal</h2><div class="f"><input id="gi" type="number" min="1" placeholder="Goal, e.g. 1000"><button class="p" id="gs" style="margin:0">Update goal</button></div><div class="mut" id="gm"></div></div>
  <div class="card"><h2>Stream schedule</h2><div id="se"></div><div class="f"><button id="sa">Add stream</button><button class="p" id="ss" style="margin:0">Publish schedule</button></div><div class="mut" id="sm"></div></div>
+ <div class="card"><h2>Kick followers</h2><p class="mut" style="margin-top:0">Shown on the home page. Update it whenever you like.</p><div class="f"><input id="ki" type="number" min="0" placeholder="Followers, e.g. 250"><button class="p" id="ks" style="margin:0">Save followers</button></div><div class="mut" id="km"></div></div>
  <button id="so">Log out</button></div></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script><script src="config.js"></script><script src="app.js"></script>
 <script>
@@ -15,10 +16,11 @@ $("se").addEventListener("input",e=>{const d=e.target.dataset;if(d.k)sched[+d.i]
 $("se").addEventListener("click",e=>{if(e.target.dataset.x){sched.splice(+e.target.dataset.x,1);seUI()}});
 $("sa").onclick=()=>{sched.push({day:"Mon",time:"20:00",title:""});seUI()};
 $("ss").onclick=async()=>{const r=await sb.from("site").upsert({key:"schedule",value:sched}).select();$("sm").textContent=r.error?"Not saved: "+r.error.message:"Published. Check the home page."};
+$("ks").onclick=async()=>{const n=Math.floor(+$("ki").value);if(!(n>=0)||$("ki").value==="")return $("km").textContent="Enter a number, 0 or higher.";const r=await sb.from("site").upsert({key:"kick",value:{followers:n,at:new Date().toISOString()}}).select();$("km").textContent=r.error?"Not saved: "+r.error.message:"Saved. Home page now shows "+n.toLocaleString()+" Kick followers."};
 $("gs").onclick=async()=>{const n=Math.floor(+$("gi").value);if(!(n>0))return $("gm").textContent="Enter a number above 0.";
  const r=await sb.from("site").upsert({key:"goal",value:{target:n}}).select();
  $("gm").textContent=r.error?"Not saved: "+r.error.message:"Saved. Home page goal is now "+n.toLocaleString()+(subs>=n?". You already have "+subs.toLocaleString()+" subscribers, so set a higher goal.":".")};
-async function load(){sched=(await site("schedule"))||[];const g=await site("goal");$("gi").value=g?g.target:"";seUI();
+async function load(){sched=(await site("schedule"))||[];const kk=await site("kick");$("ki").value=kk&&kk.followers!=null?kk.followers:"";const g=await site("goal");$("gi").value=g?g.target:"";seUI();
  try{const c=await ytChannel();subs=c.subs;if(g&&subs>=g.target)$("gm").textContent="Goal reached ("+subs.toLocaleString()+" subscribers). Set a new goal."}catch(e){}}
 function setU(u){renderNav(!!u);$("auth").classList.toggle("hide",!!u);$("tools").classList.toggle("hide",!u);if(u)load()}
 const need=()=>{$("am").textContent="Add your Supabase keys in config.js first.";return true};
