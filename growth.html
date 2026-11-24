@@ -1,0 +1,28 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Growth · KamalFPS</title><link rel="stylesheet" href="theme.css">
+<style>.gs{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:26px 0 18px}.m{padding:20px}.m b{display:block;font:400 clamp(30px,5vw,46px)/1 var(--serif);color:var(--gold);margin-top:6px}.sm{font-size:13px}.pred{font:400 clamp(22px,3vw,30px)/1.25 var(--serif)}.pred em{color:var(--gold)}.card svg{display:block;margin-top:10px}@media(max-width:760px){.gs{grid-template-columns:1fr 1fr}}</style></head>
+<body class="priv"><div class="aurora"><i></i><i></i><i></i></div>
+<main class="wrap"><nav class="top" id="top"></nav><div class="eyebrow">Automatic tracking</div><h1>Channel <em>growth</em></h1>
+<p class="mut" id="none">Collecting data. Snapshots are saved about once an hour, so charts appear after a few hours. (Check that the automation is set up: SETUP-AUTOMATION.md)</p>
+<div id="body" class="hide">
+<div class="gs"><div class="card m"><span class="l">Subscribers now</span><b id="n">0</b></div><div class="card m"><span class="l">Last 24 hours</span><b id="g1">–</b></div><div class="card m"><span class="l">Last 7 days</span><b id="g7">–</b></div><div class="card m"><span class="l">Last 30 days</span><b id="g30">–</b></div></div>
+<div class="card"><h2>Road to your goal</h2><div class="pred" id="pred">…</div><p class="mut sm" id="ins" style="margin-bottom:0"></p></div>
+<div class="card"><h2>Subscribers</h2><div id="c1"></div></div>
+<div class="card"><h2>Total views</h2><div id="c2"></div></div></div></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script><script src="config.js"></script><script src="app.js"></script>
+<script>
+(async()=>{if(!sb)return;
+const r=await sb.from("snapshots").select("ts,subs,views").gte("ts",new Date(Date.now()-90*864e5).toISOString()).order("ts").limit(5000),D=r.data||[];
+if(D.length<2)return;$("none").classList.add("hide");$("body").classList.remove("hide");
+const now=D[D.length-1],T=x=>Date.parse(x.ts),ago=h=>{const t=T(now)-h*36e5,p=D.find(x=>T(x)>=t);return p&&T(p)<=t+h*36e5*.25?now.subs-p.subs:null},fm=v=>v==null?"–":(v>=0?"+":"")+v.toLocaleString();
+$("n").textContent=now.subs.toLocaleString();$("g1").textContent=fm(ago(24));$("g7").textContent=fm(ago(168));$("g30").textContent=fm(ago(720));
+function chart(id,k){const w=800,h=220,p=10,x0=T(D[0]),x1=T(now),ys=D.map(d=>d[k]),y0=Math.min(...ys),y1=Math.max(...ys),sp=(y1-y0)||1,X=t=>p+(t-x0)/((x1-x0)||1)*(w-2*p),Y=v=>h-p-(v-y0)/sp*(h-2*p),pts=D.map(d=>X(T(d)).toFixed(1)+","+Y(d[k]).toFixed(1)).join(" ");
+$(id).innerHTML=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="width:100%;height:220px"><defs><linearGradient id="g${k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e8c987" stop-opacity=".35"/><stop offset="1" stop-color="#e8c987" stop-opacity="0"/></linearGradient></defs><polygon points="${p},${h-p} ${pts} ${w-p},${h-p}" fill="url(#g${k})"/><polyline points="${pts}" fill="none" stroke="#e8c987" stroke-width="2.5" vector-effect="non-scaling-stroke"/></svg><div class="mut sm">${y0.toLocaleString()} → ${y1.toLocaleString()} · ${new Date(x0).toLocaleDateString()} to ${new Date(x1).toLocaleDateString()}</div>`}
+chart("c1","subs");chart("c2","views");
+const g=await site("goal"),tg=g?+g.target:0,t14=T(now)-14*864e5,p=D.find(x=>T(x)>=t14),days=(T(now)-T(p))/864e5,rate=days>=1?(now.subs-p.subs)/days:null;
+if(!tg)$("pred").textContent="Set a goal in Studio to see your prediction.";
+else if(now.subs>=tg)$("pred").innerHTML="Goal of <em>"+tg.toLocaleString()+"</em> reached. Set a bigger one in Studio.";
+else if(rate==null||rate<=0)$("pred").innerHTML="Need more data (or growth is flat) to predict. You need <em>"+Math.ceil((tg-now.subs)/Math.max(1,DAYS_LEFT())).toLocaleString()+"</em> subs per day to hit "+tg.toLocaleString()+" by Dec 31.";
+else{const d=Math.ceil((tg-now.subs)/rate),dt=new Date(Date.now()+d*864e5),need=(tg-now.subs)/Math.max(1,DAYS_LEFT());
+$("pred").innerHTML=`At <em>${rate.toFixed(1)}</em> subs/day you reach ${tg.toLocaleString()} around <em>${dt.toLocaleDateString([],{day:"numeric",month:"short",year:"numeric"})}</em>. To make it by Dec 31 you need <em>${need.toFixed(1)}</em>/day.`}
+const i=await site("insights");if(i)$("ins").textContent=`Best day to post so far: ${i.best_day} (avg ${i.best_avg.toLocaleString()} views, from your last ${i.n} uploads. A rough guide, older videos have more views).`})();
+</script></body></html>
