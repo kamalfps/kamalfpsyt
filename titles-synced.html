@@ -1,0 +1,27 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Titles · KamalFPS</title><link rel="stylesheet" href="theme.css">
+<style>pre{white-space:pre-wrap;font:inherit;color:var(--mut);margin:10px 0;padding:12px;border:1px solid var(--bd);border-radius:12px;background:rgba(255,255,255,.03)}.ttl{font:700 1.15rem Sora,sans-serif;margin-top:8px}</style></head><body class="priv">
+<div class="aurora"><i></i><i></i><i></i></div>
+<main class="wrap"><nav class="top" id="top"></nav><div class="eyebrow">Daily content</div><h1>Titles and <em>descriptions</em></h1><p class="mut">Made automatically for every day from today to Dec 31, 2026, on your road to 2027.</p>
+<div class="card"><div class="f"><input id="gm" placeholder="Your game (e.g. Valorant)"><input id="gg" placeholder="Rank goal (e.g. Radiant)"></div>
+ <div class="f"><button class="p" id="all" style="margin:0">Copy all titles</button><button id="more">Show all days</button></div><div class="mut" id="cnt"></div></div>
+<div id="out"></div></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script><script src="config.js"></script><script src="app.js"></script>
+<script>
+const TH=[["{g} ranked grind: {r} or nothing","Ranked grind toward {r}."],["Trying 1v5 clutches in {g} until I win","Chasing clutch plays until one finally works."],["My {g} aim routine on the road to {r}","The aim routine that is getting me closer to {r}."],["Playing {g} with chat until we win","Queueing with viewers and not stopping until we win."],["{g} but every loss means a new challenge","Every loss adds a challenge. Chat picks them."],["Learning from the best: {g} pro tips","Testing pro tips live to see what actually works."],["Subscriber goal stream: {g} all night","A long stream to push the subscriber goal."],["Unlucky? Comeback attempt in {g}","Starting from a bad run and fighting back."],["No-death challenge in {g}","Trying to survive full games without dying."],["{g} solo vs squad: who wins?","Solo queue against full squads."],["Reviewing my worst {g} rounds","Going through mistakes to fix them live."],["{g} ranked with viewers","Ranked games with people from chat."],["New sensitivity, same {g} grind","Testing new settings in real matches."],["Can I hit {r} today? {g} live","A push for {r} with everything on the line."]];
+const P=JSON.parse(localStorage.getItem("kfgen")||"{}");$("gm").value=P.g||"";$("gg").value=P.r||"";
+let days=[],show=7;
+function build(){const g=$("gm").value.trim()||"FPS",r=$("gg").value.trim()||"the next rank",f=s=>s.replace(/\{g\}/g,g).replace(/\{r\}/g,r),tag=g.replace(/[^a-z0-9]/gi,"");
+ localStorage.setItem("kfgen",JSON.stringify({g:$("gm").value.trim(),r:$("gg").value.trim()}));
+ const n0=new Date(),y=n0.getFullYear()===2026?2026:2026,start=new Date(n0.getFullYear(),n0.getMonth(),n0.getDate()),end=new Date(2026,11,31),total=Math.round((end-start)/864e5)+1;days=[];
+ for(let i=0;i<total;i++){const d=new Date(start.getFullYear(),start.getMonth(),start.getDate()+i),left=Math.round((new Date(2027,0,1)-d)/864e5),doy=Math.round((d-new Date(2026,0,1))/864e5),t=TH[doy%TH.length],last=i===total-1;
+  const title=(last?"Last stream of 2026: ":`Day ${doy+1}: `)+f(t[0]);
+  const desc=`${f(t[1])}\n\n${last?"The final day of 2026.":`Day ${doy+1} of 365.`} My road to becoming a name in ${g} before 2027, with ${left} ${left===1?"day":"days"} left. Goal: ${r}.\n\nCome say hi in chat and help me reach the next subscriber goal.\n\nTimestamps\n0:00 Intro\n\nSubscribe so you don't miss the next stream: https://youtube.com/@kamalfps?sub_confirmation=1\n\n#kamalfps #${tag} #RoadTo2027`;
+  days.push({date:d.toLocaleDateString("en",{weekday:"short",month:"short",day:"numeric"}),left,title,desc})}
+ $("cnt").textContent=total>0?`${total} days planned. ${days.length?"":""}`:"2026 is over. See you in 2027.";
+ $("more").textContent=show>7?"Show first 7 days":"Show all "+total+" days";draw()}
+function draw(){$("out").innerHTML=days.slice(0,show).map((x,i)=>`<div class="card st" style="animation-delay:${i*50}ms"><div class="grow"><b>${E(x.date)}</b><span class="mut">${x.left} days to 2027</span></div><div class="ttl">${E(x.title)} <span class="mut" style="font:.8rem system-ui">${x.title.length}/100</span></div><pre>${E(x.desc)}</pre><button data-c="t${i}">Copy title</button> <button data-c="d${i}">Copy description</button></div>`).join("")}
+document.addEventListener("click",async e=>{const c=e.target.dataset.c;if(!c)return;const x=days[+c.slice(1)];await navigator.clipboard.writeText(c[0]==="t"?x.title:x.desc);e.target.textContent="Copied";setTimeout(()=>build(),900)});
+$("all").onclick=async()=>{await navigator.clipboard.writeText(days.map(x=>x.date+": "+x.title).join("\n"));$("all").textContent="Copied"};
+$("more").onclick=()=>{show=show>7?7:days.length;build()};
+$("gm").oninput=$("gg").oninput=build;build();
+</script></body></html>
