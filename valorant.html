@@ -1,0 +1,49 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Valorant · KamalFPS</title><meta name="theme-color" content="#0a0a0b"><link rel="stylesheet" href="theme.css">
+<style>
+.stage{position:relative;margin:clamp(30px,5vw,56px) 0 22px;padding:clamp(30px,5vw,54px) clamp(8px,2vw,24px)}
+.stage::before,.stage::after{content:"";position:absolute;width:26px;height:26px;border:1px solid var(--gold2);opacity:.7}
+.stage::before{left:0;top:0;border-right:0;border-bottom:0}.stage::after{right:0;bottom:0;border-left:0;border-top:0}
+.stage .c1,.stage .c2{position:absolute;width:26px;height:26px;border:1px solid var(--gold2);opacity:.7}
+.stage .c1{right:0;top:0;border-left:0;border-bottom:0}.stage .c2{left:0;bottom:0;border-right:0;border-top:0}
+.tier{display:block;font:400 clamp(60px,13vw,150px)/.95 var(--serif);letter-spacing:-.03em;margin:10px 0 0;background:linear-gradient(180deg,#fff7e3 10%,var(--gold) 55%,var(--gold2));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 40px rgba(232,201,135,.25))}
+.stage .bar{margin:26px 0 16px}
+.meta{display:flex;gap:22px;flex-wrap:wrap;align-items:center;font-size:14px;color:var(--mut)}
+.gs{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin:0 0 10px}.gs .card{margin:0}.m{padding:20px}.m b{display:block;font:400 clamp(28px,4.4vw,44px)/1 var(--serif);color:var(--gold);margin-top:6px}
+.wl{display:flex;gap:8px;flex-wrap:wrap}.wl i{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;font:500 12px var(--sans);font-style:normal;letter-spacing:.06em}
+.wl i.win{color:var(--ok);border:1px solid var(--ok);background:rgba(93,255,176,.08)}.wl i.loss{color:var(--bad);border:1px solid var(--bad);background:rgba(255,107,107,.08)}
+.av{width:46px;height:46px;border-radius:50%;object-fit:cover;background:rgba(255,255,255,.06);border:1px solid var(--line);flex:none}
+.ini{display:grid;place-items:center;font:italic 400 22px var(--serif);color:var(--gold)}
+.nm{flex:1;min-width:0}.nm b{display:block;font:400 22px/1.15 var(--serif);color:var(--ink)}.nm span{font-size:13px;color:var(--mut)}
+.res{font:500 11px var(--sans);letter-spacing:.18em;text-transform:uppercase;min-width:48px}.res.win{color:var(--ok)}.res.loss{color:var(--bad)}
+.kda{text-align:right;font-variant-numeric:tabular-nums}.kda b{display:block;font:400 22px/1.1 var(--serif);color:var(--ink)}.kda span{font-size:12px;color:var(--mut);letter-spacing:.06em}
+.ft{font-size:12px;margin-top:30px;max-width:70ch}
+@media(max-width:760px){.gs{grid-template-columns:1fr 1fr}.gs .card:last-child{grid-column:span 2}.res{min-width:38px}}
+</style></head><body>
+<main class="wrap"><nav class="top" id="top"></nav>
+<div class="eyebrow">Ranked · updates automatically</div>
+<h1>My <em>Valorant</em> stats</h1>
+<p class="mut">Rank, form and agents from my competitive games.</p>
+<div id="app"><p class="mut">Loading stats…</p></div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script><script src="config.js"></script><script src="app.js"></script>
+<script>
+const TC={iron:"#8a8a8a",bronze:"#c08a56",silver:"#cfd4db",gold:"#e8c987",platinum:"#47c9d1",diamond:"#a98bff",ascendant:"#3ddc97",immortal:"#ff6b88",radiant:"#fff0b3"};
+const tc=n=>TC[String(n||"").split(" ")[0].toLowerCase()]||"#e8c987";
+const ago=at=>{const s=(Date.now()-(at>1e12?at:at*1000))/1000;for(const[a,n]of[[86400,"d"],[3600,"h"],[60,"m"]])if(s>=a)return Math.floor(s/a)+n+" ago";return"just now"};
+const gm=n=>n+(n===1?" game":" games");
+const av=(u,n)=>{const i=E((n||"?")[0]);return u?`<img class="av" src="${E(u)}" alt="" loading="lazy" data-i="${i}" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'av ini',textContent:this.dataset.i}))">`:`<span class="av ini">${i}</span>`};
+function view(d){const r=d.rank||{},p=d.player||{},rc=d.recent,rr=Math.max(0,Math.min(100,+r.rr||0)),ch=r.change,ms=d.matches||[],ag=d.agents||[];
+ let h=`<section class="stage rv"><i class="c1"></i><i class="c2"></i><div class="lab"><span class="dot"></span>${E(p.name)}#${E(p.tag)} · ${E(p.region)}</div><span class="tier">${E(r.tier||"Unranked")}</span><div class="bar"><i id="rrb" style="width:0"></i></div><div class="meta"><span>${rr} / 100 RR</span>${ch==null?"":`<span class="${ch>=0?"ok":"bad"}">Last game ${ch>=0?"+":""}${ch}</span>`}${r.peak?`<span class="pill" style="color:${tc(r.peak)};border-color:${tc(r.peak)}">Peak ${E(r.peak)}${r.peakSeason?" · "+E(String(r.peakSeason).toUpperCase()):""}</span>`:""}</div></section>`;
+ if(rc&&rc.games)h+=`<div class="gs rv">${[[Math.round(100*rc.wins/rc.games)+"%","Win rate"],[rc.kd,"K/D"],[rc.acs,"ACS"],[rc.adr,"ADR"],[rc.hs+"%","Headshot"]].map(x=>`<div class="card m"><span class="l">${x[1]}</span><b>${x[0]}</b></div>`).join("")}</div><p class="mut" style="font-size:13px;margin:0 0 22px">Last ${gm(rc.games)} of competitive${d.act?` · this act ${d.act.wins} wins in ${d.act.games}`:""}</p>`;
+ if(ms.length)h+=`<div class="card rv"><h2>Form</h2><div class="wl">${ms.slice().reverse().map(m=>`<i class="${m.won?"win":"loss"}" title="${E(m.map)}">${m.won?"W":"L"}</i>`).join("")}</div><p class="mut" style="font-size:13px;margin:12px 0 0">Oldest on the left, latest on the right.</p></div>`;
+ if(ag.length)h+=`<div class="card rv"><h2>Top agents</h2>${ag.map(a=>`<div class="row">${av(a.icon,a.name)}<div class="nm"><b>${E(a.name)}</b><span>${gm(a.games)}</span></div><div class="kda"><b>${Math.round(100*a.wins/a.games)}%</b><span>${a.kd} K/D</span></div></div>`).join("")}</div>`;
+ if(ms.length)h+=`<div class="card rv"><h2>Recent matches</h2>${ms.map(m=>`<div class="row"><span class="res ${m.won?"win":"loss"}">${m.won?"Win":"Loss"}</span>${av(m.icon,m.agent)}<div class="nm"><b>${E(m.map)}</b><span>${E(m.score)} · ${E(m.agent)} · ${ago(m.at)}</span></div><div class="kda"><b>${m.k}/${m.d}/${m.a}</b><span>ACS ${m.acs}</span></div></div>`).join("")}</div>`;
+ return h+`<p class="mut ft">${d.updated?"Updated "+ago(Date.parse(d.updated))+". ":""}Stats come from the unofficial HenrikDev API. This page isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties.</p>`}
+let last="";
+async function go(){let d=null;try{d=await site("valorant")}catch(e){}
+ const a=$("app");if(!d){if(!last)a.innerHTML='<div class="card"><h2>Stats are on the way</h2><p class="mut" style="margin:0">The first update lands soon. Check back in a bit.</p></div>';return}
+ if(d.updated===last)return;last=d.updated;a.innerHTML=view(d);
+ a.querySelectorAll(".rv").forEach((n,i)=>{n.style.transitionDelay=i*90+"ms";requestAnimationFrame(()=>n.classList.add("in"))});
+ setTimeout(()=>{const b=$("rrb");if(b)b.style.width=Math.max(0,Math.min(100,+d.rank.rr||0))+"%"},350)}
+go();setInterval(go,3e5);
+</script></body></html>

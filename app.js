@@ -4,7 +4,7 @@ const E=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;
 const sb=window.supabase&&CFG.SUPABASE_URL&&CFG.SUPABASE_ANON_KEY?window.supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_ANON_KEY):null;
 const still=matchMedia("(prefers-reduced-motion:reduce)").matches;
 const DAYS_LEFT=()=>{const n=new Date();return Math.max(0,Math.round((new Date(2027,0,1)-new Date(n.getFullYear(),n.getMonth(),n.getDate()))/864e5))};
-function renderNav(full){const el=$("top");if(!el)return;const cur=location.pathname.split("/").pop()||"index.html",items=[["index.html","Home"],["titles.html","Titles"],["thumbnails.html","Thumbnails"],["growth.html","Growth"],["studio.html","Studio"]];
+function renderNav(full){const el=$("top");if(!el)return;const cur=location.pathname.split("/").pop()||"index.html",items=[["index.html","Home"],["titles.html","Titles"],["thumbnails.html","Thumbnails"],["growth.html","Growth"],["valorant.html","Valorant"],["studio.html","Studio"]];
  el.innerHTML='<a class="logo" href="index.html">KamalFPS</a>'+(full?"<span>"+items.map(([h,t])=>`<a href="${h}"${h===cur?' class="on"':""}>${t}</a>`).join("")+"</span>":"")}
 let _au=null;const authReady=()=>_au||(_au=sb?sb.auth.getSession().then(r=>r.data.session?r.data.session.user:null):Promise.resolve(null));
 renderNav(false);
