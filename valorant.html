@@ -41,7 +41,9 @@ function view(d){const r=d.rank||{},p=d.player||{},rc=d.recent,rr=Math.max(0,Mat
  return h+`<p class="mut ft">${d.updated?"Updated "+ago(Date.parse(d.updated))+". ":""}Stats come from the unofficial HenrikDev API. This page isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties.</p>`}
 let last="";
 async function go(){let d=null;try{d=await site("valorant")}catch(e){}
- const a=$("app");if(!d){if(!last)a.innerHTML='<div class="card"><h2>Stats are on the way</h2><p class="mut" style="margin:0">The first update lands soon. Check back in a bit.</p></div>';return}
+ const a=$("app");if(!d){if(!last){const u=await authReady();let x="";
+  if(u){const st=await site("valorant_status").catch(()=>null);x=`<p class="mut" style="margin:14px 0 0;font-size:13px"><b style="color:var(--gold)">Only you see this:</b> ${st?(st.ok?"The updater ran but saved no stats.":"The last update failed: "+E(st.error)+" ("+ago(Date.parse(st.at))+")"):"The updater has not run yet. Finish SETUP-VALORANT.md, then check Supabase > Edge Functions > valorant-stats > Logs."}</p>`}
+  a.innerHTML='<div class="card"><h2>Stats are on the way</h2><p class="mut" style="margin:0">The first update lands soon. Check back in a bit.</p>'+x+'</div>'}return}
  if(d.updated===last)return;last=d.updated;a.innerHTML=view(d);
  a.querySelectorAll(".rv").forEach((n,i)=>{n.style.transitionDelay=i*90+"ms";requestAnimationFrame(()=>n.classList.add("in"))});
  setTimeout(()=>{const b=$("rrb");if(b)b.style.width=Math.max(0,Math.min(100,+d.rank.rr||0))+"%"},350)}
