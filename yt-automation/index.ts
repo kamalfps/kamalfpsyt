@@ -47,7 +47,10 @@ Deno.serve(async (req) => {
     // 1) hourly snapshot
     if (!ch.statistics.hiddenSubscriberCount) {
       const last = (await sb.from("snapshots").select("ts").order("ts", { ascending: false }).limit(1)).data?.[0];
-      if (!last || Date.now() - Date.parse(last.ts) > 55 * 6e4) await sb.from("snapshots").insert({ subs, views, videos: vcount });
+      if (!last || Date.now() - Date.parse(last.ts) > 55 * 6e4) {
+        const ins = await sb.from("snapshots").insert({ subs, views, videos: vcount });
+        if (ins.error) throw new Error("snapshots: " + ins.error.message); // shows the real reason instead of failing silently
+      }
     }
     // 2) live alert
     const live = vids.find((v) => v.snippet.liveBroadcastContent === "live");
