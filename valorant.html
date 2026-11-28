@@ -32,8 +32,9 @@ const tc=n=>TC[String(n||"").split(" ")[0].toLowerCase()]||"#e8c987";
 const ago=at=>{const s=(Date.now()-(at>1e12?at:at*1000))/1000;for(const[a,n]of[[86400,"d"],[3600,"h"],[60,"m"]])if(s>=a)return Math.floor(s/a)+n+" ago";return"just now"};
 const gm=n=>n+(n===1?" game":" games");
 const av=(u,n)=>{const i=E((n||"?")[0]);return u?`<img class="av" src="${E(u)}" alt="" loading="lazy" data-i="${i}" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'av ini',textContent:this.dataset.i}))">`:`<span class="av ini">${i}</span>`};
-function view(d){const r=d.rank||{},p=d.player||{},rc=d.recent,rr=Math.max(0,Math.min(100,+r.rr||0)),ch=r.change,ms=d.matches||[],ag=d.agents||[];
+function view(d,own){const r=d.rank||{},p=d.player||{},rc=d.recent,rr=Math.max(0,Math.min(100,+r.rr||0)),ch=r.change,ms=d.matches||[],ag=d.agents||[];
  let h=`<section class="stage rv"><i class="c1"></i><i class="c2"></i><div class="lab"><span class="dot"></span>${E(p.name)}#${E(p.tag)} · ${E(p.region)}</div><span class="tier">${E(r.tier||"Unranked")}</span><div class="bar"><i id="rrb" style="width:0"></i></div><div class="meta"><span>${rr} / 100 RR</span>${ch==null?"":`<span class="${ch>=0?"ok":"bad"}">Last game ${ch>=0?"+":""}${ch}</span>`}${r.peak?`<span class="pill" style="color:${tc(r.peak)};border-color:${tc(r.peak)}">Peak ${E(r.peak)}${r.peakSeason?" · "+E(String(r.peakSeason).toUpperCase()):""}</span>`:""}</div></section>`;
+ if(own&&!ms.length&&d.diag){const g=d.diag;h+=`<p class="mut" style="font-size:13px;margin:0 0 18px"><b style="color:var(--gold)">Only you see this:</b> no matches to show. The API returned ${g.returned} (${g.usable} with details, ${g.found} yours${g.modes&&g.modes.length?"; modes: "+E(g.modes.join(", ")):""}${g.error?"; error: "+E(g.error):""}).</p>`}
  if(rc&&rc.games)h+=`<div class="gs rv">${[[Math.round(100*rc.wins/rc.games)+"%","Win rate"],[rc.kd,"K/D"],[rc.acs,"ACS"],[rc.adr,"ADR"],[rc.hs+"%","Headshot"]].map(x=>`<div class="card m"><span class="l">${x[1]}</span><b>${x[0]}</b></div>`).join("")}</div><p class="mut" style="font-size:13px;margin:0 0 22px">Last ${gm(rc.games)} of competitive${d.act?` · this act ${d.act.wins} wins in ${d.act.games}`:""}</p>`;
  if(ms.length)h+=`<div class="card rv"><h2>Form</h2><div class="wl">${ms.slice().reverse().map(m=>`<i class="${m.won?"win":"loss"}" title="${E(m.map)}">${m.won?"W":"L"}</i>`).join("")}</div><p class="mut" style="font-size:13px;margin:12px 0 0">Oldest on the left, latest on the right.</p></div>`;
  if(ag.length)h+=`<div class="card rv"><h2>Top agents</h2>${ag.map(a=>`<div class="row">${av(a.icon,a.name)}<div class="nm"><b>${E(a.name)}</b><span>${gm(a.games)}</span></div><div class="kda"><b>${Math.round(100*a.wins/a.games)}%</b><span>${a.kd} K/D</span></div></div>`).join("")}</div>`;
@@ -41,10 +42,10 @@ function view(d){const r=d.rank||{},p=d.player||{},rc=d.recent,rr=Math.max(0,Mat
  return h+`<p class="mut ft">${d.updated?"Updated "+ago(Date.parse(d.updated))+". ":""}Stats come from the unofficial HenrikDev API. This page isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties.</p>`}
 let last="";
 async function go(){let d=null;try{d=await site("valorant")}catch(e){}
- const a=$("app");if(!d){if(!last){const u=await authReady();let x="";
+ const u=await authReady(),a=$("app");if(!d){if(!last){let x="";
   if(u){const st=await site("valorant_status").catch(()=>null);x=`<p class="mut" style="margin:14px 0 0;font-size:13px"><b style="color:var(--gold)">Only you see this:</b> ${st?(st.ok?"The updater ran but saved no stats.":"The last update failed: "+E(st.error)+" ("+ago(Date.parse(st.at))+")"):"The updater has not run yet. Finish SETUP-VALORANT.md, then check Supabase > Edge Functions > valorant-stats > Logs."}</p>`}
   a.innerHTML='<div class="card"><h2>Stats are on the way</h2><p class="mut" style="margin:0">The first update lands soon. Check back in a bit.</p>'+x+'</div>'}return}
- if(d.updated===last)return;last=d.updated;a.innerHTML=view(d);
+ if(d.updated===last)return;last=d.updated;a.innerHTML=view(d,!!u);
  a.querySelectorAll(".rv").forEach((n,i)=>{n.style.transitionDelay=i*90+"ms";requestAnimationFrame(()=>n.classList.add("in"))});
  setTimeout(()=>{const b=$("rrb");if(b)b.style.width=Math.max(0,Math.min(100,+d.rank.rr||0))+"%"},350)}
 go();setInterval(go,3e5);
