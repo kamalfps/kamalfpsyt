@@ -4,6 +4,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const E = (k: string) => Deno.env.get(k);
 const J = { "Content-Type": "application/json" };
+const db = () => createClient(E("SUPABASE_URL")!, E("SUPABASE_SERVICE_ROLE_KEY")!);
 
 async function notify(text: string) { // Discord and/or Telegram, same secrets as yt-automation
   const d = E("DISCORD_WEBHOOK"); if (d) await fetch(d, { method: "POST", headers: J, body: JSON.stringify({ content: text }) });
@@ -20,8 +21,11 @@ async function henrik(path: string) {
 Deno.serve(async (req) => {
   if (req.headers.get("x-cron-secret") !== E("CRON_SECRET")) return new Response("forbidden", { status: 403 });
   try {
-    const RN = E("RIOT_NAME"), RT = E("RIOT_TAG"), RG = (E("RIOT_REGION") ?? "ap").toLowerCase();
+    const RN = E("RIOT_NAME")?.trim(), RT = E("RIOT_TAG")?.trim().replace(/^#/, "");
+    const raw = (E("RIOT_REGION") || "ap").trim().toLowerCase().replace(/["']/g, "");
+    const RG = ({ india: "ap", in: "ap", asia: "ap", sea: "ap", europe: "eu", us: "na", usa: "na", korea: "kr" } as Record<string, string>)[raw] ?? raw;
     if (!E("HENRIK_KEY") || !RN || !RT) throw new Error("Set HENRIK_KEY, RIOT_NAME and RIOT_TAG in the function secrets.");
+    if (!["ap", "eu", "na", "kr", "latam", "br"].includes(RG)) throw new Error(`RIOT_REGION "${raw}" is not valid. Use ap, eu, na or kr.`);
     const e = encodeURIComponent;
     const mmr = await henrik(`/valorant/v3/mmr/${RG}/pc/${e(RN)}/${e(RT)}`);
     const matches = await henrik(`/valorant/v3/matches/${RG}/${e(RN)}/${e(RT)}?mode=Competitive&size=10`);
@@ -49,13 +53,19 @@ Deno.serve(async (req) => {
       act: last ? { season: last.season?.short, wins: last.wins, games: last.games } : null, recent, agents,
       matches: rows.slice(0, 8).map(({ hsN, shots, ...r }) => r) };
 
-    const sb = createClient(E("SUPABASE_URL")!, E("SUPABASE_SERVICE_ROLE_KEY")!), owner = E("OWNER_ID");
+    const sb = db(), owner = E("OWNER_ID");
     const put = (k: string, v: unknown) => sb.from("site").upsert({ key: k, value: v, owner });
     const w = await put("valorant", out); if (w.error) throw new Error(w.error.message);
     const prev = (await sb.from("site").select("value").eq("key", "val_rank").maybeSingle()).data?.value;
     if (prev && cur.elo > prev.elo && cur.tier.name !== prev.tier)
       await notify(`🔥 RANK UP! ${prev.tier} → ${cur.tier.name}\nPost a Short of the game that did it, with the new rank in the title.`);
     await put("val_rank", { elo: cur.elo, tier: cur.tier.name });
+    await put("valorant_status", { ok: true, at: new Date().toISOString() });
     return new Response("ok");
-  } catch (err) { return new Response("Error: " + (err as Error).message, { status: 500 }); }
+  } catch (err) {
+    const msg = (err as Error).message;
+    // Save the reason so valorant.html can show it to you (only you see it when logged in).
+    try { await db().from("site").upsert({ key: "valorant_status", value: { ok: false, error: msg.slice(0, 200), at: new Date().toISOString() }, owner: E("OWNER_ID") }); } catch (_) {}
+    return new Response("Error: " + msg, { status: 500 });
+  }
 });
